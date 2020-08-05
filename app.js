@@ -10,6 +10,7 @@ app.use(express.json({extended : true}));
 
 app.get('/', (req, res) => {
     res.end(`
+         ${JSON.stringify(proccess.env)}
         <a href="./about">About</a>
         <br>
         <a href="./gallery">Gallery</a>
@@ -36,5 +37,5 @@ app.get('/about', (req, res) => {
 });
 
 
-const PORT = config.get('port') || 5000;
+const PORT = config.get('port') || 80;
 app.listen(PORT, () => console.log(`App has been started on port ${PORT}...`) );
