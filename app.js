@@ -10,13 +10,9 @@ app.use(express.json({extended : true}));
 
 app.get('/', (req, res) => {
     res.end(`
-         ${JSON.stringify(process.env)}
         <a href="./about">About</a>
         <br>
         <a href="./gallery">Gallery</a>
-         ${JSON.stringify(process.env.NODE_ENV)}
-         ${JSON.stringify(process.env.PORT)}
-         ${JSON.stringify(config.get('produtionDavo'))}
         <h1>Home Page</h1>
     `);
 });
