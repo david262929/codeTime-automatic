@@ -16,6 +16,7 @@ app.get('/', (req, res) => {
         <a href="./gallery">Gallery</a>
          ${JSON.stringify(process.env.NODE_ENV)}
          ${JSON.stringify(process.env.PORT)}
+         ${JSON.stringify(config.get('produtionDavo'))}
         <h1>Home Page</h1>
     `);
 });
