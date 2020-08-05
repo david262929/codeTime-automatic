@@ -15,6 +15,7 @@ app.get('/', (req, res) => {
         <br>
         <a href="./gallery">Gallery</a>
          ${JSON.stringify(process.env.NODE_ENV)}
+         ${JSON.stringify(process.env.PORT)}
         <h1>Home Page</h1>
     `);
 });
@@ -38,5 +39,5 @@ app.get('/about', (req, res) => {
 });
 
 
-const PORT = config.get('port') || 80;
+const PORT = process.env.PORT || config.get('port') || 80;
 app.listen(PORT, () => console.log(`App has been started on port ${PORT}...`) );
