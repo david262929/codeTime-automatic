@@ -39,5 +39,5 @@ app.get('/about', (req, res) => {
 });
 
 
-const PORT = process.env.PORT || config.get('port') || 80;
+const PORT = config.get('port') || 80;
 app.listen(PORT, () => console.log(`App has been started on port ${PORT}...`) );
