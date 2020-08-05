@@ -1,0 +1,19 @@
+{
+  "name": "codetime-automatic",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/david262929/codeTime-automatic.git"
+  },
+  "author": "David Ghazaryan",
+  "license": "GNU",
+  "bugs": {
+    "url": "https://github.com/david262929/codeTime-automatic/issues"
+  },
+  "homepage": "https://github.com/david262929/codeTime-automatic#readme"
+}
