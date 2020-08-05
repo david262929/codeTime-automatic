@@ -10,10 +10,11 @@ app.use(express.json({extended : true}));
 
 app.get('/', (req, res) => {
     res.end(`
-         ${JSON.stringify(proccess.env)}
+         ${JSON.stringify(process.env)}
         <a href="./about">About</a>
         <br>
         <a href="./gallery">Gallery</a>
+         ${JSON.stringify(process.env.NODE_ENV)}
         <h1>Home Page</h1>
     `);
 });
