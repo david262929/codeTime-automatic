@@ -5,6 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
+    "davo": "node app.js",
+    "worker": "node worker/worker.js",
     "server": "nodemon app.js"
   },
   "repository": {
