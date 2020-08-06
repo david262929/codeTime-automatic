@@ -38,7 +38,7 @@ const log = data => {
         createDirIfNotExists(LOG_DIR);
         const LOGFILE_PATH = `${LOG_DIR}/error.log`;
         createFileIfNotExists(LOGFILE_PATH);
-        fs.appendFile(LOGFILE_PATH, `Error : ${data}\nDate : ${new Date()}\n`, () => {});
+        fs.appendFile(LOGFILE_PATH, `Error : ${JSON.stringify(data)}\nDate : ${new Date()}\n`, () => {});
     } catch (e) {
         console.log(e)
     }
