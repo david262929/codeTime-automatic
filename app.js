@@ -65,7 +65,7 @@ app.post('/', (req, res) => {
                 <a href="../">Home</a>
             `);
         }
-        const {file} = reaaaq.files;
+        const {file} = req.files;
         const {name} = file;
 
         if (!name) {
