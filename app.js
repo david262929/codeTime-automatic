@@ -55,7 +55,20 @@ app.get('/', (req, res) => {
 });
 
 app.post('/', (req, res) => {
+    if(!req.files){
+        res.end(`
+            <h1>Have not attached a file</h1>
+            <a href="../">Home</a>
+        `);
+    }
     const {file} = req.files;
+
+    if(!file){
+        res.end(`
+            <h1>Have not attached a file</h1>
+            <a href="../">Home</a>
+        `);
+    }
 
     const distDir = path.resolve(`dist/`);
     createDirIfNotExists(distDir);
@@ -70,7 +83,7 @@ app.post('/', (req, res) => {
     })
 
     res.end(`
-        <h1>Spasi</h1>
+        <h1>Uploaded</h1>
         <a href="../">Home</a>
     `);
 });
@@ -85,7 +98,7 @@ app.get('/upload', (req, res) => {
         <br>
         <br>
         <form action="/" method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" />
+            <input type="file" name="file" required/>
             <input type="submit" value="Upload" />
         </form>
     `);
