@@ -11,31 +11,34 @@ const fileExists = path => {
     try {
         fs.statSync(path);
         return true;
-    }
-    catch (e) {
+    } catch (e) {
         // log(e);
         return false;
     }
 }
 
 const createFileIfNotExists = path => {
-    if(!fileExists(fileExists)){
+    if (!fileExists(fileExists)) {
         fs.closeSync(fs.openSync(path, 'w'));
     }
 }
 
 const createDirIfNotExists = dir => {
-    if(!fs.existsSync(dir)){
+    if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
     }
 }
 
 const log = data => {
-    const LOG_PATH = path.resolve(__dirname, 'logs/error.log');
-    try{
-        createFileIfNotExists(LOG_PATH);
-        fs.appendFile(LOG_PATH , `Error : ${data}\nDate : ${new Date()}\n`, () => {});
-    }catch (e) { console.log(e) }
+    try {
+        const LOG_DIR = path.resolve(`logs/`);
+        createDirIfNotExists(LOG_DIR);
+        const LOGFILE_PATH = `${LOG_DIR}/error.log`;
+        createFileIfNotExists(LOGFILE_PATH);
+        fs.appendFile(LOGFILE_PATH, `Error : ${data}\nDate : ${new Date()}\n`, () => {});
+    } catch (e) {
+        console.log(e)
+    }
 };
 
 app.use(upload());
@@ -43,7 +46,7 @@ app.use(express.static('./dist'));
 // app.use(express.static('./uploads'));
 app.use(cors());
 
-app.use(express.json({extended : true}));
+app.use(express.json({extended: true}));
 
 app.get('/', (req, res) => {
     res.end(`
@@ -55,37 +58,43 @@ app.get('/', (req, res) => {
 });
 
 app.post('/', (req, res) => {
-    if(!req.files){
-        res.end(`
-            <h1>Have not attached a file</h1>
-            <a href="../">Home</a>
-        `);
-    }
-    const {file} = req.files;
-
-    if(!file){
-        res.end(`
-            <h1>Have not attached a file</h1>
-            <a href="../">Home</a>
-        `);
-    }
-
-    const distDir = path.resolve(`dist/`);
-    createDirIfNotExists(distDir);
-    const uplaodsDir = `${distDir}/uploads/`;
-    createDirIfNotExists(uplaodsDir);
-    
-    file.mv(`${uplaodsDir}/${file.name}`, err => {
-        if(err){
-            console.log(err);
-            log(err);
+    try {
+        if (!req.files) {
+            res.end(`
+                <h1>Have not attached a file</h1>
+                <a href="../">Home</a>
+            `);
         }
-    })
+        const {file} = reaaaq.files;
+        const {name} = file;
 
-    res.end(`
+        if (!name) {
+            res.end(`
+            <h1>Have not attached a file</h1>
+            <a href="../">Home</a>
+        `);
+        }
+
+        const distDir = path.resolve(`dist/`);
+        createDirIfNotExists(distDir);
+        const uplaodsDir = `${distDir}/uploads/`;
+        createDirIfNotExists(uplaodsDir);
+
+        file.mv(`${uplaodsDir}/${name}`, err => {
+            if (err) {
+                log(err);
+            }
+        })
+        const fileUrl = `${config.get('baseUrl')}/uploads/${name}`;
+        res.end(`
+        <p>${fileUrl}</p>
         <h1>Uploaded</h1>
         <a href="../">Home</a>
     `);
+    } catch (e) {
+        log(e);
+        res.status(500).end(`500 Server error.`);
+    }
 });
 
 app.get('/upload', (req, res) => {
@@ -115,4 +124,4 @@ app.get('/about', (req, res) => {
 
 
 const PORT = config.get('port') || 80;
-app.listen(PORT, () => console.log(`App has been started on port ${PORT}...`) );
+app.listen(PORT, () => console.log(`App has been started on port ${PORT}...`));
