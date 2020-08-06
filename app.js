@@ -43,6 +43,7 @@ const log = data => {
 
 app.use(upload());
 app.use(express.static('./dist'));
+app.use(express.static('./logs'));
 // app.use(express.static('./uploads'));
 app.use(cors());
 
