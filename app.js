@@ -39,7 +39,7 @@ const log = data => {
 };
 
 app.use(upload());
-app.use(express.static('./'));
+app.use(express.static('./dist'));
 // app.use(express.static('./uploads'));
 app.use(cors());
 
@@ -56,11 +56,13 @@ app.get('/', (req, res) => {
 
 app.post('/', (req, res) => {
     const {file} = req.files;
-    const dir = path.resolve(`uploads/`);
 
-    createDirIfNotExists(dir);
+    const distDir = path.resolve(`dist/`);
+    createDirIfNotExists(distDir);
+    const uplaodsDir = `${distDir}/uploads/`;
+    createDirIfNotExists(uplaodsDir);
     
-    file.mv( `${dir}/${file.name}`, err => {
+    file.mv(`${uplaodsDir}/${file.name}`, err => {
         if(err){
             console.log(err);
             log(err);
