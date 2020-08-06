@@ -21,7 +21,7 @@ const fileExists = path => {
 }
 
 const createFileIfNotExists = path => {
-    if (!fileExists(fileExists)) {
+    if (!fileExists(path)) {
         fs.closeSync(fs.openSync(path, 'w'));
     }
 }
