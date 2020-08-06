@@ -39,6 +39,8 @@ const log = data => {
 };
 
 app.use(upload());
+app.use(express.static('./'));
+// app.use(express.static('./uploads'));
 app.use(cors());
 
 app.use(express.json({extended : true}));
