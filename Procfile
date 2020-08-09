@@ -1,2 +1,2 @@
-web: npm run davo
+web: npm run start
 worker: npm run worker
