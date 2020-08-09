@@ -72,11 +72,11 @@ module.exports = async (req, res, next) => {
             return res.end(`Not allowed Department type`)
         }
 
-        const {department} = req.body;
-
-        if( !['vitrina'].includes(department) ){
-            return res.end(`Not allowed Department type`)
-        }
+        // const {department} = req.body;
+        //
+        // if( !['vitrina'].includes(department) ){
+        //     return res.end(`Not allowed Department type`)
+        // }
 
 
         req.checkesOptions = {
