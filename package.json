@@ -8,7 +8,7 @@
     "davo": "nodemon test.app.js",
     "worker": "node worker/worker.js",
     "cron": "node cron.js",
-    "test": "nodemon functions/add.js",
+    "test": "nodemon src/functions/add.js",
     "server": "nodemon app.js"
   },
   "repository": {

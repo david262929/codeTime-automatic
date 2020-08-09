@@ -2,7 +2,7 @@ const path = require('path')
 const fs = require('fs')
 const config = require('config')
 const {log, scrapper, createDirIfNotExists, haveExtention} = require('../functions/functions')
-// const {unZip, zipDir} = require('../functions/zip')
+// const {unZip, zipDir} = require('../src/functions/zip')
 
 // unZip( path.resolve('uploads/projects/test-project/archive/archive.zip'), path.resolve('uploads/projects/test-project/website/') )
 // zipDir(path.resolve('uploads/projects/test-project/website/'), path.resolve('uploads/projects/test-project/archive/archive3.zip') )
@@ -30,12 +30,12 @@ module.exports = async (req, res, next) => {
             case 'upload': //zipFile
                 const {zipFile} = req.files;
                 if(!zipFile){
-                    throw(`Havn't passed a file.`)
+                    return res.end(`Havn't passed a file.`)
                 }
 
                 const haveZipFileExtention = haveExtention(zipFile.name, '.zip');
                 if(!haveZipFileExtention){
-                    throw(`Passed file not a ".zip".`)
+                    return res.end(`Passed file not a ".zip".`)
                 }
                 // code block
                 // console.log('req.files.zipFile=', req.files.zipFile)
@@ -49,7 +49,8 @@ module.exports = async (req, res, next) => {
                 const newZipFilePath = `${newZipFileDirName}/archive.zip`;
                 zipFile.mv(newZipFilePath, err => {
                     if (err) {
-                        log('aaa'+err)
+                        log(err)
+                        return res.end('Something went wrong with moving zip between fileSystem dirs ')
                     }
                 })
 
@@ -64,6 +65,19 @@ module.exports = async (req, res, next) => {
 
         // console.log('req.files.zipFile=', req.files.zipFile)
         file.type = starterSelector;
+
+        const {department} = req.body;
+
+        if( !['vitrina'].includes(department) ){
+            return res.end(`Not allowed Department type`)
+        }
+
+        const {department} = req.body;
+
+        if( !['vitrina'].includes(department) ){
+            return res.end(`Not allowed Department type`)
+        }
+
 
         req.checkesOptions = {
             file,
