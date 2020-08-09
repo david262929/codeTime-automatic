@@ -1,5 +1,5 @@
 node_modules
-dist
+uploads
 logs
 package-lock.json
 .idea
