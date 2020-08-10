@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = {
     "port": nodePort,
-    "baseUrl": `http://code-time-automatic.david262929.com:${nodePort}`,
+    "baseUrl": `http://lab.codetime.am:${nodePort}`,
     "redisUrl": `http://localhost:${redisPort}`,
     "dir": {
         "root": {
