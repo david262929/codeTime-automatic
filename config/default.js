@@ -4,7 +4,10 @@ const path = require('path');
 module.exports = {
     "port": nodePort,
     "baseUrl": `http://localhost:${nodePort}`,
-    "redisUrl": `http://localhost:${redisPort}`,
+    "redis" : {
+        "host" : `http://localhost`,
+        "port" : redisPort,
+    },
     "dir": {
         "root": {
             "absolute": `${path.resolve()}/`,
@@ -12,5 +15,6 @@ module.exports = {
         },
         "tempDirName": 'uploads',
     },
+
     "state": "development"
 }
