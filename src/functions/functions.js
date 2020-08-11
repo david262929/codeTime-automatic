@@ -39,23 +39,6 @@ const createDirIfNotExists = dir => new Promise(resolve => {
  */
 const haveExtention = (fileName, extentionName) => fileName.indexOf(extentionName) === (fileName.length - extentionName.length)
 
-const log = (data, prefix) => {
-    console.log(data)
-    try {
-        if (prefix) {
-            data = {[prefix]: data}
-        }
-        const LOG_DIR = path.resolve(`logs/`)
-        createDirIfNotExists(LOG_DIR)
-        const LOGFILE_PATH = `${LOG_DIR}/error.log`
-        createFileIfNotExists(LOGFILE_PATH)
-        fs.appendFile(LOGFILE_PATH, `Error : ${JSON.stringify(data)}\nDate : ${new Date()}\n`, () => {
-        })
-    } catch (e) {
-        console.log(e)
-    }
-}
-
 const hashOfRandomNumbers = (length = 1e9) => Math.round(length * Math.random())
 
 
@@ -153,7 +136,6 @@ module.exports = {
     dirExists,
     createFileIfNotExists,
     createDirIfNotExists,
-    log,
     scrapper,
     createUploadsTempDir,
     haveExtention,

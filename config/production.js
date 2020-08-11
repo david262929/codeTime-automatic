@@ -4,7 +4,10 @@ const path = require('path');
 module.exports = {
     "port": nodePort,
     "baseUrl": `http://lab.codetime.am:${nodePort}`,
-    "redisUrl": `http://localhost:${redisPort}`,
+    "redis" : {
+        "host" : `localhost`,
+        "port" : redisPort,
+    },
     "dir": {
         "root": {
             "absolute": `${path.resolve()}/`,
