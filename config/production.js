@@ -5,7 +5,7 @@ module.exports = {
     "port": nodePort,
     "baseUrl": `http://lab.codetime.am:${nodePort}`,
     "redis" : {
-        "host" : `http://localhost`,
+        "host" : `localhost`,
         "port" : redisPort,
     },
     "dir": {

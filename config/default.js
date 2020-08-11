@@ -5,7 +5,7 @@ module.exports = {
     "port": nodePort,
     "baseUrl": `http://localhost:${nodePort}`,
     "redis" : {
-        "host" : `http://localhost`,
+        "host" : `localhost`,
         "port" : redisPort,
     },
     "dir": {
@@ -15,6 +15,5 @@ module.exports = {
         },
         "tempDirName": 'uploads',
     },
-
     "state": "development"
 }
