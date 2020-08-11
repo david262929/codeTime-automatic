@@ -1,6 +1,16 @@
-node_modules
+# Project temp dirs
 uploads
 logs
+
+# NPM files/dir
 package-lock.json
+node_modules
+
+# IDE Project files
 .idea
+
+# MacOs Cache
 .DS_Store
+
+# Redis DB Cache
+dump.rdb
