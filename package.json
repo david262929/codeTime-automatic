@@ -6,9 +6,9 @@
   "scripts": {
     "start": "node app.js",
     "davo": "nodemon test.app.js",
-    "worker": "node worker/worker.js",
-    "cron": "node cron.js",
-    "test": "nodemon src/functions/add.js",
+    "worker": "nodemon worker/redisQueue.js",
+    "workerTest": "nodemon worker/push.data.js",
+    "test": "nodemon test.app.js",
     "server": "nodemon app.js"
   },
   "repository": {
@@ -42,6 +42,8 @@
     "node-ratify": "^1.1.32",
     "path": "^0.12.7",
     "request": "^2.88.2",
+    "rsmq": "^0.12.2",
+    "rsmq-worker": "^0.5.2",
     "shelljs": "^0.8.4",
     "tar": "^6.0.2",
     "url-parse": "^1.4.7",
