@@ -6,6 +6,7 @@ const config = require("config")
 const state = config.get('state') || "development"
 const makeDir = require('make-dir')
 const request = require('request')
+const globby = require('globby')
 
 const fileExists = path => !!fs.statSync(path)
 
@@ -30,6 +31,26 @@ const createDirIfNotExists = dir => new Promise(resolve => {
         _makeDir(dir).then(resolve)
     }
 })
+
+const getFilesFromDir = async (patterns , extensions = ['*']) => {
+    // await fs.readdir( path.resolve(testFolder), (err, files) => {
+    //     console.log(err)
+    //     if(err) {
+    //         log( JSON.stringify(err), null, 'system_error', 'error' );
+    //     }
+    //     files.forEach(file => {
+    //         console.log(file);
+    //     });
+    // });
+
+    const filesPaths = await globby(patterns, {
+        onlyFiles: true,
+        expandDirectories : {
+            extensions,
+        }
+    });
+    return filesPaths;
+}
 
 /**
  *  It checks is having fileName an extentionName and extentionName is located at the end of fileName
@@ -140,4 +161,5 @@ module.exports = {
     createUploadsTempDir,
     haveExtention,
     isUrlWorking,
+    getFilesFromDir
 }
