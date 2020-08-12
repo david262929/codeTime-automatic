@@ -23,3 +23,6 @@
 // })
 
 
+const config = require('config')
+console.log(config.get('state'),
+    config.get('port'))
