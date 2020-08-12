@@ -10,6 +10,10 @@ module.exports = {
             env: {
                 NODE_ENV: config.get('port'),
                 PORT: config.get('state')
+            },
+            env_production: {
+                "PORT": 80,
+                "NODE_ENV": "production",
             }
         }
     ]
