@@ -12,8 +12,8 @@ module.exports = {
                 PORT: config.get('state')
             },
             env_production: {
-                "PORT": 80,
-                "NODE_ENV": "production",
+                "NODE_ENV": config.get('state'),
+                "PORT": config.get('port'),
             }
         }
     ]
