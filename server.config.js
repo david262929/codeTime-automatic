@@ -8,12 +8,12 @@ module.exports = {
             exec_mode: 'cluster',
             watch: true,
             env: {
-                NODE_ENV: config.get('port'),
-                PORT: config.get('state')
+                NODE_ENV: config.get('state'),
+                PORT: config.get('port'),
             },
             env_production: {
-                "NODE_ENV": config.get('state'),
-                "PORT": config.get('port'),
+                NODE_ENV: config.get('state'),
+                PORT: config.get('port'),
             }
         }
     ]

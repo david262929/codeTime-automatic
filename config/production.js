@@ -15,5 +15,5 @@ module.exports = {
         },
         "tempDirName": 'uploads',
     },
-    "state": process.env.node_env || "production"
+    "state": process.env.NODE_ENV || "production"
 }
