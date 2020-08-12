@@ -1,4 +1,4 @@
-const nodePort = process.env.PORT || 80, redisPort = 6379;
+const nodePort = process.env.node_port || 80, redisPort = 6379;
 const path = require('path');
 
 module.exports = {
