@@ -7,16 +7,30 @@ const state = config.get('state') || "development"
 const makeDir = require('make-dir')
 const request = require('request')
 const globby = require('globby')
+const redisQueue = require("../src/functions/queue/redis");
 
-const fileExists = path => !!fs.statSync(path)
-
-const createFileIfNotExists = path => {
-    if (!fileExists(path)) {
-        fs.closeSync(fs.openSync(path, 'w'))
+const fileExists = path => {
+    try {
+        return !!fs.statSync(path)
+    }catch (e) {
+        return false
     }
 }
 
-const dirExists = dir => fs.existsSync(dir)
+const createFileIfNotExists = path => new Promise(async resolve => {
+    if (!fileExists(path)) {
+        fs.closeSync(fs.openSync(path, 'w'));
+    }
+    return resolve(true);
+})
+
+const dirExists = dir => {
+    try {
+        return !!fs.existsSync(dir)
+    }catch (e) {
+        return false
+    }
+}
 
 async function _makeDir(path) {
     if (dirExists(path)) {
@@ -28,9 +42,62 @@ async function _makeDir(path) {
 
 const createDirIfNotExists = dir => new Promise(resolve => {
     if (!dirExists(dir)) {
-        _makeDir(dir).then(resolve)
+        return _makeDir(dir).then(() => resolve(true))
     }
+    resolve(true);
 })
+
+const appendIntoLogFile = async (data, logFileName, type) => new Promise(async resolve => {
+    console.log(data, logFileName, type);
+    const LOG_DIR = path.resolve(`logs/`);
+    console.log(typeof  getFilesFromDir, 'getFilesFromDir')
+    console.log(typeof  createDirIfNotExists, LOG_DIR)
+    console.log(await createDirIfNotExists(LOG_DIR));
+    const LOGFILE_PATH = `${LOG_DIR}/${logFileName}`;
+    console.log(await createFileIfNotExists(LOGFILE_PATH), LOGFILE_PATH);
+    console.log(LOGFILE_PATH);
+    fs.appendFile(LOGFILE_PATH, `${type} : ${JSON.stringify(data)}\n Date : ${new Date()}\n------------------\n`, resolve);
+})
+
+const log = async (data, prefix = null, mode = 'endpoint_main', type = 'error') => {
+    console.log({data, prefix, mode, type});
+
+
+    const allowed = {
+        types: ['error', 'message'],
+        modes: ['endpoint_main', 'endpoint_compress', 'endpoint_options', 'worker_tasks', 'system_error']
+    }
+    try {
+        if (!data) {
+            throw("Not correct 'data'")
+        }
+
+        if (!allowed.modes.includes(mode)) {
+            throw("Not Allowed 'log' mode")
+        }
+
+        if (!allowed.types.includes(type)) {
+            throw("Not Allowed 'log' type")
+        }
+
+        if (prefix) {
+            data = {[prefix]: data}
+        }
+        await appendIntoLogFile(data, `${type}_${mode}.log`, type)
+    } catch (e) {
+        console.log(e);
+        // log(
+        //     {
+        //         e,
+        //         "details": {data, prefix, mode, type}
+        //     },
+        //     null,
+        //     'system_error',
+        //     'error'
+        // )
+        throw("Something went wrong with logging, please see last logs")
+    }
+}
 
 const getFilesFromDir = async (patterns , extensions = ['*']) => {
     // await fs.readdir( path.resolve(testFolder), (err, files) => {
@@ -87,7 +154,7 @@ const hashOfRandomNumbers = (length = 1e9) => Math.round(length * Math.random())
 //     }
 // }
 
-async function createUploadsTempDir(websitePrefix = '', path = 'uploads/projects/') {
+const createUploadsTempDir = async (websitePrefix = '', path = 'uploads/projects/') => {
     if (path === '') {
         throw "createUploadsTempDir:path parameter is required"
     }
@@ -100,7 +167,7 @@ async function createUploadsTempDir(websitePrefix = '', path = 'uploads/projects
     path += websitePrefix + hashOfRandomNumbers();
 
     try {
-        _makeDir(path)
+        await _makeDir(path)
         return path
     } catch (e) {
         log(e, "createUploadsTempDir")
@@ -151,6 +218,15 @@ const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}) => new Prom
     }
 })
 
+const addTask = async (task) => new Promise( async resolve => {
+    if(!task){
+        return resolve(false);
+    }
+
+    const _addedTask = await redisQueue.enqueue(task);
+    return _addedTask;
+})
+
 module.exports = {
     _makeDir,
     fileExists,
@@ -161,5 +237,7 @@ module.exports = {
     createUploadsTempDir,
     haveExtention,
     isUrlWorking,
-    getFilesFromDir
+    getFilesFromDir,
+    log,
+    addTask,
 }

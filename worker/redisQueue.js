@@ -1,11 +1,10 @@
 const {worker: redisQueue} = require("../src/functions/queue/redis");
-const log = require("../src/functions/logger");
+const {log} = require("../src/functions/functions");
+const doTask = require("../src/functions/tools/index");
 
-const _function = data => new Promise(resolve => {
-    setTimeout(() => {
-        console.log(data)
-        resolve();
-    }, 5000)
+const _function = data => new Promise(async resolve => {
+    await doTask(JSON.parse(data))
+    resolve()
 })
 
 redisQueue.on( "message", async (msg, next, id ) => {
