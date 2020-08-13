@@ -8,32 +8,32 @@ const {log, scrapper, createDirIfNotExists, haveExtention, isUrlWorking} = requi
 // zipDir(path.resolve('uploads/projects/test-project/website/'), path.resolve('uploads/projects/test-project/archive/archive3.zip') )
 // const {log, scrapper} = require('decompress')
 
-module.exports = async (req, res, next) => {
+module.exports = async (req, res, next) => new Promise(async resolve => {
     try {
+        const task = {};
+
         const {taskName} = req.body
         if (!taskName) {
             return res.end(`taskName not passed`);
         }
+        task.name = taskName;
 
         const {starterSelector} = req.body;
-        let file = {
-            type: 'zipFile',
-            path: '',
-        }
 
         console.log('starterSelector=', starterSelector)
 
         switch (starterSelector) {
             case 'url':
-                const {toScrapUrl} = req.body;
-                if(!toScrapUrl){
+                const {toScrappUrl} = req.body;
+                if(!toScrappUrl){
                     return res.end(`Not a normal url.`)
                 }
 
-                const _isUrlWorking = await isUrlWorking(toScrapUrl);
+                const _isUrlWorking = await isUrlWorking(toScrappUrl);
                 if(!_isUrlWorking){
                     return res.end(`Url is not working.`)
                 }
+                task.scrapp = toScrappUrl
                 // await scrapper({url : `http://newslentalj.com/vit2/feroctilfree/vsemir/`})
                 break;
             case 'upload': //zipFile
@@ -63,6 +63,7 @@ module.exports = async (req, res, next) => {
                     }
                 })
 
+                task.zipArchive = newZipFilePath;
                 // const isZipFile = await isZip(newZipFilePath);
                 // console.log( isZipFile ? 'true' : 'false' )
 
@@ -72,32 +73,34 @@ module.exports = async (req, res, next) => {
             // code block
         }
 
-        // console.log('req.files.zipFile=', req.files.zipFile)
-        file.type = starterSelector;
-
         const {department} = req.body;
 
         if( !['vitrina'].includes(department) ){
             return res.end(`Not allowed Department type`)
         }
+        task.department = department;
 
-        // const {department} = req.body;
-        //
-        // if( !['vitrina'].includes(department) ){
-        //     return res.end(`Not allowed Department type`)
-        // }
+        const {productOldName, productNewName} = req.body;
 
-
-        req.checkesOptions = {
-            file,
+        if( !!productOldName && !!productNewName){
+            return res.end(`Not allowed Department type`)
         }
+
+        task.nameReplacement = [{
+            old : productOldName,
+            new : productNewName,
+        }];
+
+
+        req.task = task;
         // log({way : })
         // res.end(`OK`);
         // next();
-        return res.end(`ok`);
+        resolve();
+        next();
     } catch (e) {
         log(e);
         return res.end(`CHOK`);
         // return res.status(401).json({message: 'Not authorized'});
     }
-}
+})
