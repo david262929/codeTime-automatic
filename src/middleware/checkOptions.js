@@ -1,7 +1,7 @@
 const path = require('path')
 const fs = require('fs')
 const config = require('config')
-const {log, scrapper, createDirIfNotExists, haveExtention} = require('../functions/functions')
+const {log, scrapper, createDirIfNotExists, haveExtention, isUrlWorking} = require('../functions/functions')
 // const {unZip, zipDir} = require('../src/functions/zip')
 
 // unZip( path.resolve('uploads/projects/test-project/archive/archive.zip'), path.resolve('uploads/projects/test-project/website/') )
@@ -25,6 +25,15 @@ module.exports = async (req, res, next) => {
 
         switch (starterSelector) {
             case 'url':
+                const {toScrapUrl} = req.body;
+                if(!toScrapUrl){
+                    return res.end(`Not a normal url.`)
+                }
+
+                const _isUrlWorking = await isUrlWorking(toScrapUrl);
+                if(!_isUrlWorking){
+                    return res.end(`Url is not working.`)
+                }
                 // await scrapper({url : `http://newslentalj.com/vit2/feroctilfree/vsemir/`})
                 break;
             case 'upload': //zipFile
