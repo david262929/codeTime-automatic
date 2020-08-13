@@ -6,7 +6,7 @@ const cors = require('cors')
 const path = require('path')
 const config = require('config')
 const checkOptions = require('./src/middleware/checkOptions')
-const {log, createUploadsTempDir, scrapper} = require('./src/functions/functions')
+const {log, createUploadsTempDir, scrapper, addTask} = require('./src/functions/functions')
 const request = require('async-request')
 
 const app = express()
@@ -28,44 +28,16 @@ app.use(express.static('./logs'))
 //
 // app.use('/api/auth', require('./routes/auth.routes'))
 //
-app.post('/options', checkOptions, (req, res) => {// .check,
+app.post('/options', checkOptions, async (req, res) => {// .check,
     try {
-        // if (!req.files) {
-        //     res.end(`
-        //         <h1>Have not attached a file</h1>
-        //         <a href="../">Home</a>
-        //     `)
-        // }
-        // const {file} = req.files
-        // const {name} = file
-        //
-        // if (!name) {
-        //     res.end(`
-        //     <h1>Have not attached a file</h1>
-        //     <a href="../">Home</a>
-        // `)
-        // }
-        //
-        // const distDir = path.resolve(`dist/`)
-        // createDirIfNotExists(distDir)
-        // const uplaodsDir = `${distDir}/uploads/`
-        // createDirIfNotExists(uplaodsDir)
-        //
-        // file.mv(`${uplaodsDir}/${name}`, err => {
-        //     if (err) {
-        //         log(err)
-        //     }
-        // })
-        // const fileUrl = `${config.get('baseUrl')}/uploads/${name}`
-        // res.end(`
-        // <p>${fileUrl}</p>
-        // <h1>Uploaded</h1>
-        // <a href="../">Home</a>
-        // `)
+        const isAddedTask = await addTask(req.task)
+        if(!isAddedTask){
+            throw('Somethink wen wrong with task adding into QUEUE');
+        }
 
         // scrapper({url: `http://newslentalj.com/vit2/feroctilfree/vsemir/`})
     } catch (e) {
-        log(e)
+        log(e, null, 'endpoint_options', 'error')
         res.status(500).end(`500 Server error.`)
     }
 })

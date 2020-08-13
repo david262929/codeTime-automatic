@@ -7,6 +7,7 @@ const state = config.get('state') || "development"
 const makeDir = require('make-dir')
 const request = require('request')
 const globby = require('globby')
+const redisQueue = require("../src/functions/queue/redis");
 
 const fileExists = path => {
     try {
@@ -64,7 +65,7 @@ const log = async (data, prefix = null, mode = 'endpoint_main', type = 'error') 
 
     const allowed = {
         types: ['error', 'message'],
-        modes: ['endpoint_main', 'endpoint_compress', 'worker_tasks', 'system_error']
+        modes: ['endpoint_main', 'endpoint_compress', 'endpoint_options', 'worker_tasks', 'system_error']
     }
     try {
         if (!data) {
@@ -217,6 +218,15 @@ const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}) => new Prom
     }
 })
 
+const addTask = async (task) => new Promise( async resolve => {
+    if(!task){
+        return resolve(false);
+    }
+
+    const _addedTask = await redisQueue.enqueue(task);
+    return _addedTask;
+})
+
 module.exports = {
     _makeDir,
     fileExists,
@@ -229,4 +239,5 @@ module.exports = {
     isUrlWorking,
     getFilesFromDir,
     log,
+    addTask,
 }
