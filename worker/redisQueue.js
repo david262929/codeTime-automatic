@@ -1,5 +1,5 @@
 const {worker: redisQueue} = require("../src/functions/queue/redis");
-const log = require("../src/functions/logger");
+const {log} = require("../src/functions/functions");
 
 const _function = data => new Promise(resolve => {
     setTimeout(() => {
