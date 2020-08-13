@@ -9,13 +9,13 @@ const redisConfigs = {
     ns: "rsmq",
 }
 
-const queueName = 'emailqueue';
+const queueName = 'taskQueue';
 
 const taskDriver = new rsmq(redisConfigs);
 
 const worker = new rsmqWorker(queueName, {
     ...redisConfigs,
-    timeout: 300000, // 5min = 5 * 60 * 1000ms
+    timeout: 600000, // 10min = 10 * 60 * 1000ms
     autostart: true,
 });
 
@@ -26,19 +26,19 @@ module.exports = {
         try {
             const response = await taskDriver.createQueueAsync({
                 qname: queueName,
-            }, )
-            if (response === 1 ) {
+            },)
+            if (response === 1) {
                 console.log("Queue created", response);
             }
         } catch (err) {
 
-            if (err.name == 'queueExists')
+            if (err.name === 'queueExists')
                 console.log(" DQueue Exists")
 
-            else ("redis error" )
+            else ("redis error")
         }
     },
-    enqueue: async (data) => {
+    enqueue: async (data) => new Promise(async resolve => {
         try {
             response = await taskDriver.sendMessageAsync({
                 qname: queueName,
@@ -47,8 +47,10 @@ module.exports = {
             if (response) {
                 console.log("Message sent. ID:", response);
             }
+            resolve(!!response)
         } catch (err) {
+            resolve(false)
             console.log(err)
         }
-    },
+    }),
 }
