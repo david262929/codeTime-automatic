@@ -35,6 +35,11 @@ const options = {
         {directory: 'js', extensions: ['.js']},
         {directory: 'css', extensions: ['.css']}
     ],
+    sources: [
+        {selector: 'img', attr: 'src'},
+        {selector: 'link[rel="stylesheet"]', attr: 'href'},
+        {selector: 'script', attr: 'src'}
+    ],
 }
 
 scrape(options).then((result) => {
