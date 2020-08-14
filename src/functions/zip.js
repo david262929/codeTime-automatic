@@ -23,15 +23,11 @@ let dest = `uploads/projects/`;
 //     })
 // }
 
-const unZip = (zipFileDir = '', pathToExtract = '') => {
-    decompress(zipFileDir, pathToExtract, {
-        plugins: [
-            decompressUnzip()
-        ]
-    }).then(() => {
-        console.log('Files decompressed')
-    })
-}
+const unZip = async (zipFileDir = '', pathToExtract = '') => new Promise(async resolve => decompress(zipFileDir, pathToExtract, {
+    plugins: [
+        decompressUnzip()
+    ]
+}).then( () => resolve(true) ))
 // unZip( path.resolve('uploads/projects/test-project/website/') , path.resolve('uploads/projects/test-project/archive/archive.zip') )
 
 // const zip = () => new Promise( async (resove, reject) => {
@@ -43,14 +39,15 @@ const unZip = (zipFileDir = '', pathToExtract = '') => {
 //     })
 // })
 
-const zipDir = (pathToZip = '', newzipFileDir = '') => {
-    compressing.tar.compressDir(pathToZip, newzipFileDir).then(() => {
+const zipDir = (pathToZip = '', newzipFileDir = '') => new Promise(async resolve => compressing.tar.compressDir(pathToZip, newzipFileDir).then(() => {
+        resolve(true)
         console.log('aaaaaa')
-    }).catch((err) => {
-        console.log('erororororororrrr')
-        console.log(err)
-    })
-}
+}).catch((err) => {
+    resolve(false)
+    console.log('erororororororrrr')
+    console.log(err)
+}))
+
 // zipDir(path.resolve('uploads/projects/test-project/website/'), path.resolve('uploads/projects/test-project/archive/archive1.zip') )
 
 /**
@@ -65,8 +62,8 @@ const isZip = (zipFullPath, deeply = false) => new Promise(resolve => {
         return resolve(false)
     }
 
-    if(!deeply){
-        return resolve( haveExtention( zipFullPath, '.zip') )
+    if (!deeply) {
+        return resolve(haveExtention(zipFullPath, '.zip'))
     }
 
     // const buffer = new Buffer(4);
