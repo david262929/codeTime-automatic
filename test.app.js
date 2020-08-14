@@ -27,7 +27,7 @@ const config = require("config")
 
 const options = {
     urls: [
-        `${config.get('baseUrl')}/uploads/projects/ukraina-i3/index.html`
+        `${config.get('baseRealUrl')}/uploads/projects/ukraina-i3/index.html`
     ],
     directory: path.resolve('uploads/projects/ukraina-i3-done'),
     subdirectories: [
