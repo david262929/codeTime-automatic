@@ -1,8 +1,7 @@
 const path = require('path')
 const fs = require('fs')
 const config = require('config')
-const {log, scrapper, createDirIfNotExists, haveExtention, isUrlWorking} = require('../functions/functions')
-// const {unZip, zipDir} = require('../src/functions/zip')
+const {log, scrapper, createDirIfNotExists, haveExtention, isUrlWorking, createUploadsTempDir} = require('../functions')
 
 // unZip( path.resolve('uploads/projects/test-project/archive/archive.zip'), path.resolve('uploads/projects/test-project/website/') )
 // zipDir(path.resolve('uploads/projects/test-project/website/'), path.resolve('uploads/projects/test-project/archive/archive3.zip') )
@@ -19,9 +18,10 @@ module.exports = async (req, res, next) => new Promise(async resolve => {
         task.name = taskName;
 
         const {starterSelector} = req.body;
-
-        console.log('starterSelector=', starterSelector)
-
+        const files = {
+            type : 'zip',
+            data : '',
+        }
         switch (starterSelector) {
             case 'url':
                 const {toScrappUrl} = req.body;
@@ -33,8 +33,8 @@ module.exports = async (req, res, next) => new Promise(async resolve => {
                 if(!_isUrlWorking){
                     return res.end(`Url is not working.`)
                 }
-                task.scrapp = toScrappUrl
-                // await scrapper({url : `http://newslentalj.com/vit2/feroctilfree/vsemir/`})
+                files.type = 'url';
+                files.data = toScrappUrl;
                 break;
             case 'upload': //zipFile
                 const {zipFile} = req.files;
@@ -49,12 +49,10 @@ module.exports = async (req, res, next) => new Promise(async resolve => {
                 // code block
                 // console.log('req.files.zipFile=', req.files.zipFile)
 
-                const {tempDirName, root : {absolute} } = config.get('dir');
-
                 const curDateWithMilliseconds = (new Date()).getTime()
-                const newZipFileDirName = `${absolute}${tempDirName}/projects/${taskName}-${curDateWithMilliseconds}/archive`;
-                await createDirIfNotExists(newZipFileDirName);
+                let newZipFileDirName = await createUploadsTempDir(null, `uploads/projects/${taskName}-${curDateWithMilliseconds}/archive`) // (Folder || Project) name + HASHs
 
+                console.log(newZipFileDirName);
                 const newZipFilePath = `${newZipFileDirName}/archive.zip`;
                 zipFile.mv(newZipFilePath, err => {
                     if (err) {
@@ -64,6 +62,9 @@ module.exports = async (req, res, next) => new Promise(async resolve => {
                 })
 
                 task.zipArchive = newZipFilePath;
+
+                files.type = 'zipFile';
+                files.data =  newZipFileDirName
                 // const isZipFile = await isZip(newZipFilePath);
                 // console.log( isZipFile ? 'true' : 'false' )
 
@@ -72,6 +73,7 @@ module.exports = async (req, res, next) => new Promise(async resolve => {
             default:
             // code block
         }
+        task.files = files;
 
         const {department} = req.body;
 
