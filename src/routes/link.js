@@ -1,7 +1,7 @@
 const {Router} = require('express')
 const config = require('config')
 const shortid = require('shortid')
-const auth = require('../middleware/auth.middleware')
+const auth = require('../functions/middleware/auth.middleware')
 const Link = require('../models/Link')
 const router = Router()
 
