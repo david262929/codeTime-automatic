@@ -7,7 +7,7 @@ const state = config.get('state') || "development"
 const makeDir = require('make-dir')
 const request = require('request')
 const globby = require('globby')
-const redisQueue = require("../src/functions/queue/redis");
+
 
 const fileExists = path => {
     try {
@@ -40,6 +40,23 @@ async function _makeDir(path) {
     return path;
 }
 
+const deleteFile = async (filePath) => new Promise(resolve => {
+    try {
+        if (!fileExists(filePath)) {
+            return resolve(true);
+        }
+        fs.unlink(filePath, (err) => {
+            if (err) {
+                throw err;
+                resolve(false)
+            }
+            resolve(true)
+        });
+    }catch (e) {
+        return resolve(false)
+    }
+})
+
 const createDirIfNotExists = dir => new Promise(resolve => {
     if (!dirExists(dir)) {
         return _makeDir(dir).then(() => resolve(true))
@@ -48,14 +65,10 @@ const createDirIfNotExists = dir => new Promise(resolve => {
 })
 
 const appendIntoLogFile = async (data, logFileName, type) => new Promise(async resolve => {
-    console.log(data, logFileName, type);
     const LOG_DIR = path.resolve(`logs/`);
-    console.log(typeof  getFilesFromDir, 'getFilesFromDir')
-    console.log(typeof  createDirIfNotExists, LOG_DIR)
-    console.log(await createDirIfNotExists(LOG_DIR));
+    await createDirIfNotExists(LOG_DIR);
     const LOGFILE_PATH = `${LOG_DIR}/${logFileName}`;
-    console.log(await createFileIfNotExists(LOGFILE_PATH), LOGFILE_PATH);
-    console.log(LOGFILE_PATH);
+    await createFileIfNotExists(LOGFILE_PATH)
     fs.appendFile(LOGFILE_PATH, `${type} : ${JSON.stringify(data)}\n Date : ${new Date()}\n------------------\n`, resolve);
 })
 
@@ -154,7 +167,7 @@ const hashOfRandomNumbers = (length = 1e9) => Math.round(length * Math.random())
 //     }
 // }
 
-const createUploadsTempDir = async (websitePrefix = '', path = 'uploads/projects/') => {
+const createUploadsTempDir = async (websitePrefix = '', path = 'uploads/projects/') => new Promise( async resolve => {
     if (path === '') {
         throw "createUploadsTempDir:path parameter is required"
     }
@@ -164,35 +177,50 @@ const createUploadsTempDir = async (websitePrefix = '', path = 'uploads/projects
         path += '/'
     }
 
-    path += websitePrefix + hashOfRandomNumbers();
+    if(websitePrefix !== null){
+        path += websitePrefix + hashOfRandomNumbers();
+    }
 
     try {
         await _makeDir(path)
-        return path
+        return resolve( path )
     } catch (e) {
         log(e, "createUploadsTempDir")
-        return false
+        return  resolve( false )
     }
-}
+})
 
-const isUrlWorking = (url, method = 'HEAD') => new Promise(resolve => request( {url, method}, (err, res) => {
+const isUrlWorking = async (url, method = 'HEAD') => new Promise(resolve => request( {url, method}, (err, res) => {
     const haveError = !!err
 
     if (haveError) log(err)
     return resolve(!haveError && /4\d\d/.test(res.statusCode) === false)
 }));
 
+const removeLastSlash = async (pathname = '') => new Promise( resolve => {
+    const splitedPathName = pathname.split('')
+    if( splitedPathName.pop() === '/'){
+        pathname = splitedPathName.join('');
+    }
+    resolve(pathname);
+})
+
 const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}) => new Promise(async (resolve, reject) => {
     try {
-        const isUrlWorking = await isUrlWorking()
-        if(!isUrlWorking){
+        const _isUrlWorking = await isUrlWorking(url)
+        if(!_isUrlWorking){
             throw("Your Url is not Working.")
         }
 
-        const {hostname, pathname} = parseUrl(url, true)
+        const curDateWithMilliseconds = (new Date()).getTime()
+        let {hostname, pathname} = parseUrl(url, true)
+        console.log(pathname);
+
+        pathname = await removeLastSlash(pathname);
         const prefix = hostname + pathname
 
-        let tempDir = createUploadsTempDir(prefix) // (Folder || Project) name + HASH
+        let tempDir = await createUploadsTempDir(null,`uploads/projects/${prefix}-${curDateWithMilliseconds}`) // (Folder || Project) name + HASH
+        console.log(tempDir)
         if (!tempDir) {
             throw("Somenting wne wrong with TEMP DIR creation.")
             return reject()
@@ -207,6 +235,11 @@ const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}) => new Prom
                 {directory: 'js', extensions: ['.js']},
                 {directory: 'css', extensions: ['.css']}
             ],
+            sources: [
+                {selector: 'img', attr: 'src'},
+                {selector: 'link[rel="stylesheet"]', attr: 'href'},
+                {selector: 'script', attr: 'src'}
+            ],
         }
 
         scrape(options).then((result) => {
@@ -216,15 +249,6 @@ const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}) => new Prom
         log(e, "scrapper")
         return resolve(null)
     }
-})
-
-const addTask = async (task) => new Promise( async resolve => {
-    if(!task){
-        return resolve(false);
-    }
-
-    const _addedTask = await redisQueue.enqueue(task);
-    return _addedTask;
 })
 
 module.exports = {
@@ -239,5 +263,5 @@ module.exports = {
     isUrlWorking,
     getFilesFromDir,
     log,
-    addTask,
+    deleteFile,
 }
