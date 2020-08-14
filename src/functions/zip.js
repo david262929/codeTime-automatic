@@ -4,7 +4,7 @@ const path = require('path')
 const compressing = require('compressing')
 const decompressUnzip = require('decompress-unzip')
 const node_ratify = require('node-ratify')
-const {createUploadsTempDir, _makeDir, log, haveExtention} = require('./functions')
+const {createUploadsTempDir, _makeDir, log, haveExtention} = require('./index')
 
 let dest = `uploads/projects/`;
 (async () => {

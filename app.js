@@ -6,7 +6,7 @@ const cors = require('cors')
 const path = require('path')
 const config = require('config')
 const checkOptions = require('./src/functions/middleware/checkOptions')
-const {log} = require('./src/functions/functions')
+const {log} = require('./src/functions')
 const {addTask} = require('./src/functions/task')
 const request = require('async-request')
 
@@ -71,8 +71,7 @@ app.get("/", async (req, res) => {
 
 
 const PORT = config.get('port') || 80;
-console.log(PORT);
 app.listen(PORT, () => {
-    console.clear();
-    console.log(`App has been started on port ${PORT}...`)
+    // console.clear();
+    console.log(`================= App has been started on port ${PORT}... =================`)
 })

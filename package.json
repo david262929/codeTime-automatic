@@ -8,7 +8,7 @@
     "davo": "nodemon test.app.js",
     "worker": "nodemon worker/redisQueue.js",
     "workerTest": "nodemon worker/push.data.js",
-    "test": "nodemon test.app.js",
+    "test": "node test.app.js",
     "server": "nodemon app.js"
   },
   "repository": {
@@ -40,6 +40,7 @@
     "gulp-clean-css": "^4.3.0",
     "gulp-concat": "^2.6.1",
     "gulp-concat-css": "^3.1.0",
+    "gulp-html": "^3.2.0",
     "gulp-imagemin": "^7.1.0",
     "gulp-minify": "^3.1.0",
     "gulp-responsive": "^3.0.1",
@@ -47,6 +48,7 @@
     "gulp-tinypng-extended": "^2.0.2",
     "gulp-uncss": "^1.0.6",
     "gulp-webp": "^4.0.1",
+    "html-validator": "^5.1.14",
     "http": "0.0.1-security",
     "image-size": "^0.8.3",
     "imagemin": "^7.0.1",
@@ -54,6 +56,7 @@
     "make-dir": "^3.1.0",
     "mkdirp": "^1.0.4",
     "node-cron": "^2.0.3",
+    "node-html-parser": "^1.2.20",
     "node-ratify": "^1.1.32",
     "path": "^0.12.7",
     "request": "^2.88.2",

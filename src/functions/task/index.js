@@ -1,5 +1,6 @@
 const gulp = require('gulp');
 const path = require('path');
+const fs = require('fs');
 const {
     _webp,
     _resizeWIthWidth,
@@ -14,12 +15,9 @@ const concat = require('gulp-concat');
 const minify = require('gulp-minify');
 const cleanCSS = require('gulp-clean-css');
 const gulpuncss = require('gulp-uncss');
-const {log, deleteFile, scrapper} = require('../functions');
+const {log, deleteFile, scrapper, dirExists} = require('../index');
 const {unZip} = require('../zip');
 const redisQueue = require("../queue/redis");
-
-console.log('aaa', deleteFile);
-
 
 // Конкатенация css
 const _concatCss = () => gulp.src('./css/*.css')
@@ -56,6 +54,26 @@ const addTask = async (task) => new Promise( async resolve => {
     }
 })
 
+const renameImgPathName = async (websitePath = '') => new Promise(resolve => {
+    if(websitePath === ''){
+        return resolve(false);
+    }
+
+    const imagesCurPath = `${websitePath}/img`;
+    if( !dirExists(imagesCurPath) ){
+        return resolve(false);
+    }
+
+    fs.rename(imagesCurPath, `${websitePath}/images`, (err) => {
+        if (err) {
+            log(err)
+            throw err;
+            return resolve(false);
+        }
+        return resolve(true);
+        console.log('renamed complete');
+    })
+})
 
 const doTask = async ( options = {}) => new Promise(async resolve => {
     const {department} = options;
@@ -68,18 +86,31 @@ const doTask = async ( options = {}) => new Promise(async resolve => {
         return resolve(false)
     }
 
+    let websitePath = '';
     switch(type){
         case 'url':
-            console.log( await scrapper({url : data}))
+            console.log( await scrapper({url : data}) )
+            websitePath = data;s
             break;
         case 'zipFile':
-            const zipFilePath = `${data}archive.zip`;
-            console.log( 'unzip ',await unZip(path.resolve(zipFilePath), path.resolve(`${data}/../website/`)) )
+            const zipFilePath = `${data}archive/archive.zip`;
+            websitePath = data;
+            console.log( 'unzip ', await unZip(path.resolve(zipFilePath), path.resolve(`${data}/website/`)) )
             console.log( 'delete zipFilePath = ', zipFilePath, await deleteFile(zipFilePath))
             break;
     }
 
+    const isRenamed = await renameImgPathName(websitePath);
+    if(isRenamed){
+        console.log('isRenamed = ', isRenamed)
 
+        const root = parse('<ul id="list"><li>Hello World</li></ul>');
+
+        console.log(root.querySelector('#list'));
+        root.querySelectorAll(`img[src*='img']`);
+
+        // renameAttachPaths()
+    }
 
 
     console.log('All was done');

@@ -1,7 +1,7 @@
 const path = require('path')
 const fs = require('fs')
 const config = require('config')
-const {log, scrapper, createDirIfNotExists, haveExtention, isUrlWorking, createUploadsTempDir} = require('../functions')
+const {log, haveExtention, isUrlWorking, createUploadsTempDir} = require('../index')
 
 // unZip( path.resolve('uploads/projects/test-project/archive/archive.zip'), path.resolve('uploads/projects/test-project/website/') )
 // zipDir(path.resolve('uploads/projects/test-project/website/'), path.resolve('uploads/projects/test-project/archive/archive3.zip') )
@@ -50,7 +50,8 @@ module.exports = async (req, res, next) => new Promise(async resolve => {
                 // console.log('req.files.zipFile=', req.files.zipFile)
 
                 const curDateWithMilliseconds = (new Date()).getTime()
-                let newZipFileDirName = await createUploadsTempDir(null, `uploads/projects/${taskName}-${curDateWithMilliseconds}/archive`) // (Folder || Project) name + HASHs
+                let newProjectDir = await createUploadsTempDir(null, `uploads/projects/${taskName}-${curDateWithMilliseconds}`) // (Folder || Project) name + HASHs
+                let newZipFileDirName = await createUploadsTempDir(null, `${newProjectDir}/archive`)
 
                 console.log(newZipFileDirName);
                 const newZipFilePath = `${newZipFileDirName}/archive.zip`;
@@ -61,10 +62,8 @@ module.exports = async (req, res, next) => new Promise(async resolve => {
                     }
                 })
 
-                task.zipArchive = newZipFilePath;
-
                 files.type = 'zipFile';
-                files.data =  newZipFileDirName
+                files.data =  newProjectDir
                 // const isZipFile = await isZip(newZipFilePath);
                 // console.log( isZipFile ? 'true' : 'false' )
 

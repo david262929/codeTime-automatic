@@ -57,6 +57,10 @@ const deleteFile = async (filePath) => new Promise(resolve => {
     }
 })
 
+const getPathAllFiles = async () => new Promise( resolve => fs.readdirSync(testFolder).forEach(file => {
+    console.log(file);
+}))
+
 const createDirIfNotExists = dir => new Promise(resolve => {
     if (!dirExists(dir)) {
         return _makeDir(dir).then(() => resolve(true))
@@ -167,6 +171,14 @@ const hashOfRandomNumbers = (length = 1e9) => Math.round(length * Math.random())
 //     }
 // }
 
+const renameAttachPaths = async (pathOfFile) => new Promise(resolve => {
+    pathOfFile
+})
+
+const imgPathRename = async (path) => new Promise(resolve => {
+    pathOfFile
+})
+
 const createUploadsTempDir = async (websitePrefix = '', path = 'uploads/projects/') => new Promise( async resolve => {
     if (path === '') {
         throw "createUploadsTempDir:path parameter is required"
@@ -183,6 +195,7 @@ const createUploadsTempDir = async (websitePrefix = '', path = 'uploads/projects
 
     try {
         await _makeDir(path)
+        path = await removeLastSlash(path);
         return resolve( path )
     } catch (e) {
         log(e, "createUploadsTempDir")
@@ -190,10 +203,15 @@ const createUploadsTempDir = async (websitePrefix = '', path = 'uploads/projects
     }
 })
 
-const isUrlWorking = async (url, method = 'HEAD') => new Promise(resolve => request( {url, method}, (err, res) => {
-    const haveError = !!err
+const isUrlWorking = async (url, method = 'OPTIONS') => new Promise(resolve => request( {url, method}, (err, res) => {
+    const haveError = !!err;
 
-    if (haveError) log(err)
+    if (haveError) {
+        console.log('haveError=',haveError)
+        log(err)
+        throw err;
+        return resolve(false)
+    }
     return resolve(!haveError && /4\d\d/.test(res.statusCode) === false)
 }));
 
@@ -207,29 +225,30 @@ const removeLastSlash = async (pathname = '') => new Promise( resolve => {
 
 const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}) => new Promise(async (resolve, reject) => {
     try {
-        const _isUrlWorking = await isUrlWorking(url)
+        const _isUrlWorking = await isUrlWorking(url);
         if(!_isUrlWorking){
             throw("Your Url is not Working.")
+            return resolve(false)
         }
+        console.log('_isUrlWorking =',_isUrlWorking);
 
         const curDateWithMilliseconds = (new Date()).getTime()
         let {hostname, pathname} = parseUrl(url, true)
-        console.log(pathname);
 
         pathname = await removeLastSlash(pathname);
         const prefix = hostname + pathname
 
-        let tempDir = await createUploadsTempDir(null,`uploads/projects/${prefix}-${curDateWithMilliseconds}`) // (Folder || Project) name + HASH
-        console.log(tempDir)
-        if (!tempDir) {
-            throw("Somenting wne wrong with TEMP DIR creation.")
-            return reject()
+        let projectDir = await createUploadsTempDir(null,`uploads/projects/${prefix}-${curDateWithMilliseconds}`) // (Folder || Project) name + HASH
+
+        if (!projectDir) {
+            throw("Somenting went wrong with TEMP DIR creation.")
+            return resolve(false)
         }
 
-        tempDir += '/website'
+        let websiteDir = `${projectDir}/website`;
         const options = {
-            urls: [url],
-            directory: tempDir,
+            urls: [ url ],
+            directory: websiteDir,
             subdirectories: [
                 {directory: 'img', extensions: ['.jpg', '.png', '.svg']},
                 {directory: 'js', extensions: ['.js']},
@@ -243,7 +262,7 @@ const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}) => new Prom
         }
 
         scrape(options).then((result) => {
-            return resolve(tempDir, result)
+            return resolve(projectDir)
         })
     } catch (e) {
         log(e, "scrapper")
