@@ -6,7 +6,7 @@ const cors = require('cors')
 const path = require('path')
 const config = require('config')
 const checkOptions = require('./src/functions/middleware/checkOptions')
-const {log, } = require('./src/functions/functions')
+const {log} = require('./src/functions/functions')
 const {addTask} = require('./src/functions/task')
 const request = require('async-request')
 
