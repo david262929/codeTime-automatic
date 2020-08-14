@@ -5,8 +5,9 @@ const fs = require('fs')
 const cors = require('cors')
 const path = require('path')
 const config = require('config')
-const checkOptions = require('./src/middleware/checkOptions')
-const {log, createUploadsTempDir, scrapper, addTask} = require('./src/functions/functions')
+const checkOptions = require('./src/functions/middleware/checkOptions')
+const {log, } = require('./src/functions/functions')
+const {addTask} = require('./src/functions/task')
 const request = require('async-request')
 
 const app = express()
@@ -27,12 +28,12 @@ app.use(express.static('./logs'))
 // // app.use(express.static('./uploads'))
 //
 // app.use('/api/auth', require('./routes/auth.routes'))
-//
+
 app.post('/options', checkOptions, async (req, res) => {// .check,
     try {
-        const isAddedTask = await addTask(req.task)
-        if(!isAddedTask){
-            throw('Somethink wen wrong with task adding into QUEUE');
+        const isAddedTask = await addTask(req.task);
+        if (!isAddedTask) {
+            throw('Something wen wrong with task adding into QUEUE');
         }
 
         // scrapper({url: `http://newslentalj.com/vit2/feroctilfree/vsemir/`})
@@ -41,7 +42,7 @@ app.post('/options', checkOptions, async (req, res) => {// .check,
         res.status(500).end(`500 Server error.`)
     }
 })
-//
+
 // app.get('/upload', (req, res) => {
 //     res.end(`
 //         <a href="../">Home</a>
