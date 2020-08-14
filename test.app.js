@@ -21,8 +21,27 @@
 //     template.email += (1 + index)
 //     taskQueue.enqueue(template)
 // })
+const path = require('path')
+const scrape = require('website-scraper')
+const config = require("config")
 
+const options = {
+    urls: [
+        `${config.get('baseRealUrl')}/uploads/projects/ukraina-i3/index.html`
+    ],
+    directory: path.resolve('uploads/projects/ukraina-i3-done'),
+    subdirectories: [
+        {directory: 'img', extensions: ['.jpg', '.png', '.svg']},
+        {directory: 'js', extensions: ['.js']},
+        {directory: 'css', extensions: ['.css']}
+    ],
+    sources: [
+        {selector: 'img', attr: 'src'},
+        {selector: 'link[rel="stylesheet"]', attr: 'href'},
+        {selector: 'script', attr: 'src'}
+    ],
+}
 
-const config = require('config')
-console.log(config.get('state'),
-    config.get('port'))
+scrape(options).then((result) => {
+    return console.log(result)
+})
