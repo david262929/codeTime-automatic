@@ -9,17 +9,30 @@ const sizeOf = require('image-size');
 const imagemin = require('gulp-imagemin');
 const imageminMozjpeg = require('imagemin-mozjpeg');
 
-const _webp = () => gulp.src('./img/*.{jpg,jpeg,JPG,JPEG}')
-    .pipe(webp({
-        quality: 80,
-        preset: 'photo',
-        method: 6
-    }))
-    .pipe(gulp.dest('./img'))
+const _webp = async () => new Promise(resolve => {
+    const stream = gulp.src('./img/*.{jpg,jpeg,JPG,JPEG}')
+        .pipe(webp({
+            quality: 80,
+            preset: 'photo',
+            method: 6
+        }))
+        .pipe(gulp.dest('./img'))
+
+    stream.on('end', () => {
+
+        resolve(true)
+    });
+    stream.on('error', (err) => {
+        if (err) {
+            log(err);
+            throw err;
+        }
+        resolve(false)
+    });
+})
 
 
-
-const _resizeWIthWidth = (done) => {
+const _resizeWIthWidth = async () => new Promise(resolve => {
     const directoryPath = path.join('./', 'img');
 
     fs.readdir(directoryPath, function (err, files) {
@@ -96,54 +109,119 @@ const _resizeWIthWidth = (done) => {
                         }
                     ]
                 }
-                return gulp.src('./img/' + file_fullname)
+                const stream = gulp.src('./img/' + file_fullname)
                     .pipe(responsive({
                         file_fullname: sizeArr,
                         errorOnUnusedImage: false,
                     }))
                     .pipe(gulp.dest('./img/'));
-            });
+
+                stream.on('end', () => {
+
+                    resolve(true)
+                });
+                stream.on('error', (err) => {
+                    if (err) {
+                        log(err);
+                        throw err;
+                    }
+                    resolve(false)
+                });
+            })
         });
     });
-}
+});
 
 
-const _guetzli = () => gulp.src('./img/*.{png,jpg,jpeg,JPG,JPEG}')
-    .pipe(imagemin([
-        imageminGuetzli({
+const _guetzli = async () => new Promise(resolve => {
+    const stream = gulp.src('./img/*.{png,jpg,jpeg,JPG,JPEG}')
+        .pipe(imagemin([
+            imageminGuetzli({
+                quality: 85
+            })
+        ]))
+        .pipe(gulp.dest('./img'));
+
+    stream.on('end', () => {
+
+        resolve(true)
+    });
+    stream.on('error', (err) => {
+        if (err) {
+            log(err);
+            throw err;
+        }
+        resolve(false)
+    });
+})
+
+
+const _mozjpeg = async () => new Promise(resolve => {
+    const stream = gulp.src('./img/*.{png,jpg,jpeg,JPG,JPEG}')
+        .pipe(imagemin([imageminMozjpeg({
             quality: 85
-        })
-    ]))
-    .pipe(gulp.dest('./img'))
+        })]))
+        .pipe(gulp.dest('./img'));
+    stream.on('end', () => {
 
+        resolve(true)
+    });
+    stream.on('error', (err) => {
+        if (err) {
+            log(err);
+            throw err;
+        }
+        resolve(false)
+    });
+})
 
+const _images = async () => new Promise(resolve => {
+    const stream = gulp.src('./img/*.{png,jpg,jpeg,JPG,JPEG}')
+        .pipe(imagemin({
+            progressive: true
+        }))
+        .pipe(gulp.dest('./img'))
+    stream.on('end', () => {
 
-const _mozjpeg = () => gulp.src('./img/*.{png,jpg,jpeg,JPG,JPEG}')
-    .pipe(imagemin([imageminMozjpeg({
-        quality: 85
-    })]))
-    .pipe(gulp.dest('./img'));
-
-const _images = () => gulp.src('./img/*.{png,jpg,jpeg,JPG,JPEG}')
-    .pipe(imagemin({
-        progressive: true
-    }))
-    .pipe(gulp.dest('./img'))
+        resolve(true)
+    });
+    stream.on('error', (err) => {
+        if (err) {
+            log(err);
+            throw err;
+        }
+        resolve(false)
+    });
+})
 
 
 // Компресия изображений
-const _tinypng = () => gulp.src('./img/*.{png,jpg,jpeg,JPG,JPEG}')
-    .pipe(plumber())
-    .pipe(tinypng({
-        key: '11lwgLRBgvS4Z1K4mcY6Q6sT96bX6Lxw',
-        sigFile: './img/.tinypng-sigs',
-        log: true
-    }))
-    .pipe(gulp.dest('./img/'))
+const _tinypng = async () => new Promise(resolve => {
+    const stream = gulp.src('./img/*.{png,jpg,jpeg,JPG,JPEG}')
+        .pipe(plumber())
+        .pipe(tinypng({
+            key: '11lwgLRBgvS4Z1K4mcY6Q6sT96bX6Lxw',
+            sigFile: './img/.tinypng-sigs',
+            log: true
+        }))
+        .pipe(gulp.dest('./img/'));
+
+    stream.on('end', () => {
+
+        resolve(true)
+    });
+    stream.on('error', (err) => {
+        if (err) {
+            log(err);
+            throw err;
+        }
+        resolve(false)
+    });
+})
 
 
-const _resize = () => gulp.src('./img/original.jpg', {allowEmpty: true})
-    .pipe(responsive({
+const _resize = async () => new Promise(resolve => {
+    const stream = gulp.src('./img/original.jpg', {allowEmpty: true}).pipe(responsive({
         'original.jpg': [
             // {
             //     width: 800,
@@ -163,8 +241,44 @@ const _resize = () => gulp.src('./img/original.jpg', {allowEmpty: true})
                 rename: 'orignal@500px.jpg'
             }
         ]
-    }))
-    .pipe(gulp.dest('./img-resized/'))
+    })).pipe(gulp.dest('./img-resized/'))
+
+    stream.on('end', () => {
+
+        resolve(true)
+    });
+    stream.on('error', (err) => {
+        if (err) {
+            log(err);
+            throw err;
+        }
+        resolve(false)
+    });
+})
+
+const autoprefixer = async () => new Promise(resolve => {
+    const autoprefixer = require('autoprefixer')
+    const sourcemaps = require('gulp-sourcemaps')
+    const postcss = require('gulp-postcss')
+
+    const stream = gulp.src('./src/*.css')
+        .pipe(sourcemaps.init())
+        .pipe(postcss([autoprefixer()]))
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest('./dest'))
+
+    stream.on('end', () => {
+
+        resolve(true)
+    });
+    stream.on('error', (err) => {
+        if (err) {
+            log(err);
+            throw err;
+        }
+        resolve(false)
+    });
+})
 
 module.exports = {
     _webp,
