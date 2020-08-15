@@ -36,7 +36,6 @@ app.post('/options', checkOptions, async (req, res) => {// .check,
             throw('Something wen wrong with task adding into QUEUE');
         }
 
-        // scrapper({url: `http://newslentalj.com/vit2/feroctilfree/vsemir/`})
     } catch (e) {
         log(e, null, 'endpoint_options', 'error')
         res.status(500).end(`500 Server error.`)
