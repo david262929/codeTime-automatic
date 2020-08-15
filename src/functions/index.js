@@ -57,9 +57,35 @@ const deleteFile = async (filePath) => new Promise(resolve => {
     }
 })
 
-const getPathAllFiles = async () => new Promise( resolve => fs.readdirSync(testFolder).forEach(file => {
-    console.log(file);
-}))
+const getPathAllFiles = async (pathName) => new Promise(async resolve => {
+    try {
+        if (!await dirExists(pathName)) {
+            log(`No such file or directory : getPathAllFiles: ${pathName}`)
+            return resolve(false);
+        }
+
+        const files = fs.readdirSync(path.resolve(pathName))
+        // files.forEach((file, index) => {
+        //     console.log(file);
+        // })
+        return resolve(files);
+    } catch (e) {
+        return resolve(false);
+    }
+})
+
+const writeFile = async (filePath, data) => new Promise(resolve => {
+    try {
+        fs.writeFile(filePath, data, (err) => {
+            if (err) return console.error(err);
+            return resolve(true)
+        })
+    } catch (err) {
+        throw err;
+        log(err);
+        resolve(false);
+    }
+})
 
 const createDirIfNotExists = dir => new Promise(resolve => {
     if (!dirExists(dir)) {
@@ -207,7 +233,6 @@ const isUrlWorking = async (url, method = 'OPTIONS') => new Promise(resolve => r
     const haveError = !!err;
 
     if (haveError) {
-        console.log('haveError=',haveError)
         log(err)
         throw err;
         return resolve(false)
@@ -250,9 +275,9 @@ const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}) => new Prom
             urls: [ url ],
             directory: websiteDir,
             subdirectories: [
-                {directory: 'img', extensions: ['.jpg', '.png', '.svg']},
-                {directory: 'js', extensions: ['.js']},
-                {directory: 'css', extensions: ['.css']}
+                {directory: 'img', extensions: [ '.jpg', '.png' ]},
+                {directory: 'js', extensions: [ '.js' ]},
+                {directory: 'css', extensions: [ '.css', '.svg' ]}
             ],
             sources: [
                 {selector: 'img', attr: 'src'},
@@ -261,12 +286,15 @@ const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}) => new Prom
             ],
         }
 
-        scrape(options).then((result) => {
+        scrape(options).then( () => {
             return resolve(projectDir)
-        })
+        }).catch((err) => {
+            throw err;
+            resolve(false)
+        });
     } catch (e) {
         log(e, "scrapper")
-        return resolve(null)
+        return resolve(false)
     }
 })
 
@@ -283,4 +311,6 @@ module.exports = {
     getFilesFromDir,
     log,
     deleteFile,
+    writeFile,
+    getPathAllFiles,
 }
