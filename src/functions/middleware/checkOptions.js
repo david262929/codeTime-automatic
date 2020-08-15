@@ -83,8 +83,8 @@ module.exports = async (req, res, next) => new Promise(async resolve => {
 
         const {productOldName, productNewName} = req.body;
 
-        if( !!productOldName && !!productNewName){
-            return res.end(`Not allowed Department type`)
+        if( !productOldName && !productNewName){
+            return res.end(`Old and New produtNames are required.`)
         }
 
         task.nameReplacement = [{
