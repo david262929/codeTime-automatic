@@ -15,10 +15,11 @@ const concat = require('gulp-concat');
 const minify = require('gulp-minify');
 const cleanCSS = require('gulp-clean-css');
 const gulpuncss = require('gulp-uncss');
-const {log, deleteFile, scrapper, dirExists, writeFile, getPathAllFiles} = require('../index');
+const {log, deleteFile, scrapper, dirExists, writeFile, getPathAllFiles, fileExists, _makeDir} = require('../index');
 const {unZip} = require('../zip');
 const cheerio = require('cheerio')
 const redisQueue = require("../queue/redis");
+const indexAllowedTypes = ['index.php', 'index.html'];
 
 // Конкатенация css
 const _concatCss = () => gulp.src('./css/*.css')
@@ -97,9 +98,8 @@ const imagesDirRename = async ($, websiteAbsPath) => new Promise(async resolve =
         }
 
         const imagesPath = await getPathAllFiles(isRenamed) // isRenamed == newPath
-        console.log(imagesPath);
 
-        const imagesimagesDirRenameSelectorForHTML = (await generateSelector(imagesPath, `img[src*='%d/%s']`.replace('%d', childDirNameFrom))).join(', ')
+        const imagesSelectorForHTML = (await generateSelector(imagesPath, `img[src*='%d/%s']`.replace('%d', childDirNameFrom))).join(', ')
 
         const $imagesToRefactor = $(imagesSelectorForHTML);
         $imagesToRefactor.each((index, $image) => {
@@ -107,11 +107,11 @@ const imagesDirRename = async ($, websiteAbsPath) => new Promise(async resolve =
             const oldSrc = $image.attr('src');
             const newSrc = oldSrc.replace(`${childDirNameFrom}/`, `${childDirNameTo}/`);
             $image.attr('src', newSrc);
-            console.log($image.attr('src'))
         })
 
-        // rename img files in csses
+        $(imagesSelectorForHTML).each((index, $image) => console.log($.html($image)));
 
+        // rename img files in csses
         const cssPath = `${websiteAbsPath}/css`;
         const cssFilesPath = await getPathAllFiles(cssPath) // isRenamed == newPath
         console.log('cssFilesPath = ', cssFilesPath);
@@ -152,13 +152,45 @@ const hrefToOffer = ($, offer = '{offer}') => $(`a[href]`).each((index, $imgEl) 
 })
 
 const removeMetaInfo = $ => $(`
-    meta[property*="og"], 
+    meta[property*="og"],
     meta[name="author"],
     meta[name*="msapplication-"],
     meta[name*="theme-color"],
-    link[rel="icon"], 
+    link[rel="icon"],
+    link[rel="shortcut"],
     link[rel="apple-touch-icon"]
 `).remove()
+
+const productRename = async ($, nameReplacements) => new Promise(async resolve => {
+    try {
+        let curState = $('html').html();
+        nameReplacements.forEach(nameReplacement => {
+            const {oldName, newName} = nameReplacement;
+            curState = curState.split(oldName).join(newName)
+        })
+        resolve(curState);
+    }catch (e) {
+        resolve(false)
+        log(e)
+        console.log(e);
+    }
+})
+
+// Cheked
+const toComment = ($, ...selectors) =>  $(`${selectors.join(', ')}`).each((index, $tag) => $($tag).replaceWith($(`<!-- Commented ${$.html($tag)}-->`)))
+
+const toEmptyFormTagActionAttr = $ => $('form[action]').removeAttr('action')
+
+const removeAnchorTargetAttr = $ => $('a[target]').removeAttr('target')
+
+const addJquery = $ => $('head').prepend(`<script
+  src="https://code.jquery.com/jquery-3.5.1.min.js"
+  integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+  crossorigin="anonymous"></script>`)
+
+const addHashToken = ($, hashToken) => $('body').attr('data-hash', hashToken)
+
+const addCountryCode = $ => $('body').append(`<select name="country" style="display: none"></select>`);
 
 const doTask = async (options = {}) => new Promise(async resolve => {
     const {department} = options;
@@ -179,23 +211,45 @@ const doTask = async (options = {}) => new Promise(async resolve => {
         case 'zipFile':
             const zipFilePath = `${data}/archive/archive.zip`;
             websitePath = `${data}/website`;
-            console.log('unzip ', await unZip(path.resolve(zipFilePath), path.resolve(websitePath)))
-            console.log('delete zipFilePath = ', zipFilePath, await deleteFile(zipFilePath))
+            await _makeDir(websitePath);
+            const unZiped = await unZip(path.resolve(zipFilePath), path.resolve(websitePath))
+            if(!unZiped){
+                throw "Can't unzip";
+            }
+            console.log('unzip =', unZiped)
+            // console.log('delete zipFilePath = ', zipFilePath, await deleteFile(zipFilePath))
             break;
     }
 
+    console.log('websitePath = ',websitePath)
     const websiteAbsPath = path.resolve(websitePath);
-    const htmlPath = `${websiteAbsPath}/index.html`;
-    const htmlString = fs.readFileSync(htmlPath, {"encoding": "utf8", "flag": "r"});
 
-    const $ = cheerio.load(htmlString, {
-        xml: {
-            withDomLvl1: true,
-            normalizeWhitespace: false,
-            xmlMode: true,
-            decodeEntities: true
+    let htmlPath = ``;
+
+    indexAllowedTypes.forEach(indexAllowedType => {
+        if (htmlPath !== '') {
+            return;
         }
-    });
+        const tempPath = `${websiteAbsPath}/${indexAllowedType}`;
+        if (fileExists(tempPath)) {
+            htmlPath = tempPath;
+        }
+    })
+    console.log('htmlPath = ',htmlPath)
+
+    const htmlString = fs.readFileSync(path.resolve('uploads/projects/newslentalj.com-vit2-feroctilfree-vsemir-525114465/website/index.html'));
+
+    // const htmlparser2 = require('htmlparser2');
+    // const dom = htmlparser2.parseDOM(htmlString, {
+    //     xml: {
+    //         withDomLvl1: true,
+    //         normalizeWhitespace: false,
+    //         xmlMode: true,
+    //         decodeEntities: true
+    //     }
+    // });
+
+    let $ = cheerio.load(htmlString, { decodeEntities: false });
 
     await imagesDirRename($, websiteAbsPath);
 
@@ -208,10 +262,33 @@ const doTask = async (options = {}) => new Promise(async resolve => {
     // remove Favicons/Manifest/Author/
     removeMetaInfo($)
 
+    const {nameReplacements} = options;
+    if (!!nameReplacements.length) {
+        const newHTML = await productRename($, nameReplacements);
+        if( !newHTML ){
+            throw "Something went wrong after product renaming."
+            return;
+        }
+        $ = cheerio.load(newHTML, { decodeEntities: false });
+    }
 
+    toComment($, 'script', 'noscript', 'input[type="hidden"]')
 
-    const isHtmlWroted = await writeFile(htmlPath, $.html());
-    console.log('wroted = ', isHtmlWroted);
+    toEmptyFormTagActionAttr($);
+
+    removeAnchorTargetAttr($);
+
+    addJquery($)
+
+    const {hashToken} = options;
+    if (!!hashToken.length) {
+        addHashToken($, hashToken);
+    }
+
+    addCountryCode($)
+
+    const isHtmlWroten = await writeFile(htmlPath, $.html());
+    console.log('wroten a HTML = ', isHtmlWroten);
 
     console.log('All was done');
 })
