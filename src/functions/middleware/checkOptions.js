@@ -7,7 +7,7 @@ const {log, haveExtention, isUrlWorking, createUploadsTempDir} = require('../ind
 // zipDir(path.resolve('uploads/projects/test-project/website/'), path.resolve('uploads/projects/test-project/archive/archive3.zip') )
 // const {log, scrapper} = require('decompress')
 
-module.exports = async (req, res, next) => new Promise(async resolve => {
+module.exports = async (req, res, next) => new Promise( async resolve => {
     try {
         const task = {};
 
@@ -75,25 +75,31 @@ module.exports = async (req, res, next) => new Promise(async resolve => {
         task.files = files;
 
         const {department} = req.body;
-
         if( !['vitrina'].includes(department) ){
             return res.end(`Not allowed Department type`)
         }
         task.department = department;
 
         const {productOldName, productNewName} = req.body;
-
-        if( !productOldName && !productNewName){
+        if( !!productOldName && !productNewName){
             return res.end(`Old and New produtNames are required.`)
         }
-
-        task.nameReplacement = [{
-            old : productOldName,
-            new : productNewName,
+        task.nameReplacements = [{
+            oldName : productOldName,
+            newName : productNewName,
         }];
 
 
+        const {hashToken} = req.body;
+        if( !hashToken ){
+            return res.end(`Have Not 'hashToken'`)
+        }
+        task.hashToken = hashToken;
+
+
+        console.log('hashToken = ',hashToken)
         req.task = task;
+        console.log('task = ',task)
         // log({way : })
         // res.end(`OK`);
         // next();
