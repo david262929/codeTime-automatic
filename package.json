@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/david262929/codeTime-automatic#readme",
   "dependencies": {
+    "autoprefixer": "^9.8.6",
     "body-parser": "^1.19.0",
     "cheerio": "^1.0.0-rc.3",
     "compressing": "^1.5.1",
@@ -40,7 +41,9 @@
     "gulp-html": "^3.2.0",
     "gulp-imagemin": "^7.1.0",
     "gulp-minify": "^3.1.0",
+    "gulp-postcss": "^8.0.0",
     "gulp-responsive": "^3.0.1",
+    "gulp-sourcemaps": "^2.6.5",
     "gulp-tinypng-compress": "^1.2.5",
     "gulp-tinypng-extended": "^2.0.2",
     "gulp-uncss": "^1.0.6",
