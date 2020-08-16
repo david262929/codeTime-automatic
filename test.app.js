@@ -49,66 +49,59 @@
 //     return console.log(result)
 // })
 
+const productRename = async ($, nameReplacements) => new Promise( resolve => {
+    const curState = $.html();
+    curState.replace('Диалайф', 'xuyxuyxuy' )
+    nameReplacements.forEach( nameReplacement => {
+        const {oldName, newName} = nameReplacement;
+        curState.replace(oldName, newName )
+        console.log('aaaaaaa')
+    })
+
+    console.log( curState );
+    $("html").html( curState );
+    resolve(true);
+})
 
 const fs = require('fs');
 const path = require('path');
+const cheerio = require('cheerio');
+const utf8 = require('utf8');
+const htmlparser2 = require('htmlparser2');
 // require('./src/tools/htmlParser')
 
-const dirExists = dir => {
-    try {
-        return !!fs.existsSync(dir)
-    }catch (e) {
-        return false
+const htmlPath = path.resolve( `uploads/projects/sayt-1597467065643/website/yob.html` );
+const htmlString = fs.readFileSync(htmlPath, {"encoding": "utf8", "flag": "r"});
+
+
+const dom = htmlparser2.parseDOM(htmlString, {
+    xml: {
+        withDomLvl1: true,
+        normalizeWhitespace: false,
+        xmlMode: true,
+        decodeEntities: true
     }
-}
+});
 
-const getPathAllFiles = async (pathName) => new Promise( resolve => {
-    const files = fs.readdirSync( path.resolve(pathName) )
-    // files.forEach( (file, index) => {
-    //     console.log(file);
-    // })
-    return resolve (files);
-})
-
-const renameImgPathName = async (websitePath = '', childDirNameFrom = 'img', childDirNameTo = 'images') => new Promise(resolve => {
-    if(websitePath === ''){
-        return resolve(false);
-    }
-
-    const imagesCurPath = `${websitePath}/${childDirNameFrom}`;
-    if( !dirExists(imagesCurPath) ){
-        return resolve(false);
-    }
-
-    const newPath = `${websitePath}/${childDirNameTo}`;
-    fs.rename(imagesCurPath, newPath, async (err) => {
-        if (err) {
-            log(err)
-            throw err;
-            return resolve(false);
-        }
-        console.log(await getPathAllFiles(newPath, ));
-        console.log('renamed complete');
-        return resolve(newPath);
-    })
-})
-
-const generateSelector = async () => new Promise(resolve => {
-    `img[src*='img/profile.jpg']`
-})
-
-x = async () => {
-    const websiteDir = path.resolve('uploads/projects/david262929.com-1597405545192/website');
-    const isRenamed = await renameImgPathName(websiteDir);
-    console.log('isRenamed = ', isRenamed)
-    if(isRenamed){
-        const data = fs.readFileSync(`${websiteDir}/index.html`,
-            {encoding:'utf8', flag:'r'});
+const $ = cheerio.load( dom );
 
 
-        document.querySelectorAll(`img[src*='img/profile.jpg']`);
+const nameReplacements = [ { oldName: 'pageFirst', newName: 'Gagooooooo' } ]
+let curState = $('html').html().toString();
 
-        const { parse } = require('node-html-parser');
-    }
-}
-x()
+// console.log(curState)
+// if( !!nameReplacements.length ){
+
+const {oldName, newName} = nameReplacements[0];
+
+// curState.indexOf('body')
+
+console.log(curState.indexOf('pageFirst'))
+curState = curState.split('pageFirst').join( 'Gagooooooo' )
+
+// console.log('aaaaaaa')
+
+$('html').html(curState);
+console.log($('html').html());
+    // productRename($, nameReplacements);
+// }
