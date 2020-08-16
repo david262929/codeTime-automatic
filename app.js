@@ -1,14 +1,13 @@
 const express = require('express')
 const bodyparser = require("body-parser")
 const upload = require('express-fileupload')
-const fs = require('fs')
+// const fs = require('fs')
 const cors = require('cors')
 const path = require('path')
 const config = require('config')
 const checkOptions = require('./src/functions/middleware/checkOptions')
 const {log} = require('./src/functions')
 const {addTask} = require('./src/functions/task')
-const request = require('async-request')
 
 const app = express()
 app.set("views", path.join(__dirname, "src/views"))
@@ -31,7 +30,10 @@ app.use(express.static('./logs'))
 
 app.post('/options', checkOptions, async (req, res) => {// .check,
     try {
+        // res.end(`aaa500 Server error1.`)
+        console.log(req.task)
         const isAddedTask = await addTask(req.task);
+        console.log('isAddedTask = ',isAddedTask)
         if (!isAddedTask) {
             throw('Something wen wrong with task adding into QUEUE');
         }
@@ -72,5 +74,9 @@ app.get("/", async (req, res) => {
 const PORT = config.get('port') || 80;
 app.listen(PORT, () => {
     // console.clear();
-    console.log(`================= App has been started on port ${PORT}... =================`)
+    console.log(`==============================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+     App has been started on port ${PORT}... 
+        ===============================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================`)
+
+
 })
