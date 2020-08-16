@@ -1,8 +1,8 @@
 const fs = require('fs')
-const decompress = require('decompress')
 const path = require('path')
 const compressing = require('compressing')
-const decompressUnzip = require('decompress-unzip')
+const extract = require('extract-zip')
+
 const node_ratify = require('node-ratify')
 const {createUploadsTempDir, _makeDir, log, haveExtention} = require('./index')
 
@@ -11,41 +11,24 @@ let dest = `uploads/projects/`;
     await _makeDir(path.resolve(`${dest}`))
 })()
 
-// console.log(tarball)
 
-// async function unzip () {
-//     decompress('25-new.zip', path.resolve('./archives/exported'), {
-//         plugins: [
-//             decompressUnzip()
-//         ]
-//     }).then(() => {
-//         console.log('Files decompressed')
-//     })
-// }
-
-const unZip = async (zipFileDir = '', pathToExtract = '') => new Promise(async resolve => decompress(zipFileDir, pathToExtract, {
-    plugins: [
-        decompressUnzip()
-    ]
-}).then( () => resolve(true) ))
+const unZip = async (zipFileDir = '', pathToExtract = '') => new Promise(async resolve => {
+    try {
+        await extract(zipFileDir, {dir: pathToExtract + '/'})
+        resolve(true);
+    } catch (e) {
+        log(e)
+        resolve(false);
+    }
+})
 // unZip( path.resolve('uploads/projects/test-project/website/') , path.resolve('uploads/projects/test-project/archive/archive.zip') )
 
-// const zip = () => new Promise( async (resove, reject) => {
-//     compressing.tar.compressDir('./dist/', path.resolve('./archives/archive1.zip') ).then(() => {
-//         console.log('aaaaaa')
-//     }).catch((err) => {
-//         console.log('erororororororrrr')
-//         console.log(err)
-//     })
-// })
 
 const zipDir = (pathToZip = '', newzipFileDir = '') => new Promise(async resolve => compressing.tar.compressDir(pathToZip, newzipFileDir).then(() => {
-        resolve(true)
-        console.log('aaaaaa')
+    resolve(true)
 }).catch((err) => {
     resolve(false)
-    console.log('erororororororrrr')
-    console.log(err)
+    log(err)
 }))
 
 // zipDir(path.resolve('uploads/projects/test-project/website/'), path.resolve('uploads/projects/test-project/archive/archive1.zip') )
