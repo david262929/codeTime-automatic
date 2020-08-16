@@ -57,6 +57,24 @@ const deleteFile = async (filePath) => new Promise(resolve => {
     }
 })
 
+const copyFile = async (filePath, newFilePath) => new Promise(resolve => {
+    try {
+        if (!fileExists(filePath)) {
+            return resolve(true);
+        }
+        fs.copyFile(filePath, newFilePath, (err) => {
+            if (err) {
+                throw err;
+                resolve(false)
+            }
+            resolve(true)
+        });
+    }catch (e) {
+        return resolve(false)
+    }
+})
+
+
 const getPathAllFiles = async (pathName) => new Promise(async resolve => {
     try {
         if (!await dirExists(pathName)) {
@@ -197,14 +215,6 @@ const hashOfRandomNumbers = (length = 1e9) => Math.round(length * Math.random())
 //     }
 // }
 
-const renameAttachPaths = async (pathOfFile) => new Promise(resolve => {
-    pathOfFile
-})
-
-const imgPathRename = async (path) => new Promise(resolve => {
-    pathOfFile
-})
-
 const createUploadsTempDir = async (websitePrefix = '', path = 'uploads/projects/') => new Promise( async resolve => {
     if (path === '') {
         throw "createUploadsTempDir:path parameter is required"
@@ -313,4 +323,5 @@ module.exports = {
     deleteFile,
     writeFile,
     getPathAllFiles,
+    copyFile,
 }
