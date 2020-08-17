@@ -1,4 +1,5 @@
 const {Router} = require('express')
+require('dotenv').config();
 const config = require('config')
 const shortid = require('shortid')
 const auth = require('../functions/middleware/auth.middleware')
