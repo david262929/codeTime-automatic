@@ -204,137 +204,144 @@ const addHashToken = ($, hashToken) => $('body').attr('data-hash', hashToken)
 const addCountryCode = $ => $('body').append(`<select name="country" style="display: none"></select>`);
 
 const doTask = async (options = {}) => new Promise(async resolve => {
-    const {department} = options;
+    try {
+        const {department} = options;
 
-    const {files: {type, data}} = options;
+        const {files: {type, data}} = options;
 
-    if (!type || !data) {
-        throw('Url/Zip have incorrect DATA');
-        return resolve(false)
-    }
+        if (!type || !data) {
+            throw('Url/Zip have incorrect DATA');
+            return resolve(false)
+        }
 
-    let websitePath = '';
-    const projectDir = data;
-    switch (type) {
-        case 'url':
-            const projectTemp = await scrapper({url: data})
-            websitePath = `${projectTemp}/website`;
-            break;
-        case 'zipFile':
-            const zipFilePath = `${data}/archive/archive.zip`;
-            websitePath = `${data}/website`;
-            await _makeDir(websitePath);
-            const unZiped = await unZip(path.resolve(zipFilePath), path.resolve(websitePath))
-            if(!unZiped){
-                throw "Can't unzip";
+        let websitePath = '';
+        const projectDir = data;
+        switch (type) {
+            case 'url':
+                const projectTemp = await scrapper({url: data})
+                websitePath = `${projectTemp}/website`;
+                _makeDir(path.resolve(`${websitePath}/../archive`))
+                break;
+            case 'zipFile':
+                const zipFilePath = `${data}/archive/archive.zip`;
+                websitePath = `${data}/website`;
+                await _makeDir(websitePath);
+                const unZiped = await unZip(path.resolve(zipFilePath), path.resolve(websitePath))
+                if(!unZiped){
+                    throw "Can't unzip";
+                }
+                console.log('unzip =', unZiped)
+                // console.log('delete zipFilePath = ', zipFilePath, await deleteFile(zipFilePath))
+                break;
+        }
+
+        console.log('websitePath = ',websitePath)
+        const websiteAbsPath = path.resolve(websitePath);
+
+        let htmlPath = ``;
+
+        indexAllowedTypes.forEach(indexAllowedType => {
+            if (htmlPath !== '') {
+                return;
             }
-            console.log('unzip =', unZiped)
-            // console.log('delete zipFilePath = ', zipFilePath, await deleteFile(zipFilePath))
-            break;
-    }
+            const tempPath = `${websiteAbsPath}/${indexAllowedType}`;
+            if (fileExists(tempPath)) {
+                htmlPath = tempPath;
+            }
+        })
+        console.log('htmlPath = ',htmlPath)
 
-    console.log('websitePath = ',websitePath)
-    const websiteAbsPath = path.resolve(websitePath);
+        const htmlString = fs.readFileSync(htmlPath);
 
-    let htmlPath = ``;
+        // const htmlparser2 = require('htmlparser2');
+        // const dom = htmlparser2.parseDOM(htmlString, {
+        //     xml: {
+        //         withDomLvl1: true,
+        //         normalizeWhitespace: false,
+        //         xmlMode: true,
+        //         decodeEntities: true
+        //     }
+        // });
+        console.log('Cheerio load before');
+        let $ = cheerio.load(htmlString, { decodeEntities: false });
+        console.log('Cheerio load after');
 
-    indexAllowedTypes.forEach(indexAllowedType => {
-        if (htmlPath !== '') {
-            return;
+        await imagesDirRename($, websiteAbsPath);
+        console.log('imagesDirRename function done')
+
+        // img alt=""
+        addImgAlts($)
+
+        // href value => {offer}
+        hrefToOffer($)
+
+        // remove Favicons/Manifest/Author/
+        removeMetaInfo($)
+
+        const {nameReplacements} = options;
+        if (!!nameReplacements.length) {
+            const newHTML = await productRename($, nameReplacements);
+            if( !newHTML ){
+                throw "Something went wrong after product renaming."
+                return;
+            }
+            $ = cheerio.load(newHTML, { decodeEntities: false });
         }
-        const tempPath = `${websiteAbsPath}/${indexAllowedType}`;
-        if (fileExists(tempPath)) {
-            htmlPath = tempPath;
+
+        toComment($, 'script', 'noscript', 'input[type="hidden"]')
+
+        toEmptyFormTagActionAttr($);
+
+        removeAnchorTargetAttr($);
+
+        addJquery($)
+
+        const {hashToken} = options;
+        if (!!hashToken.length) {
+            addHashToken($, hashToken);
         }
-    })
-    console.log('htmlPath = ',htmlPath)
 
-    const htmlString = fs.readFileSync(htmlPath);
+        addCountryCode($)
 
-    // const htmlparser2 = require('htmlparser2');
-    // const dom = htmlparser2.parseDOM(htmlString, {
-    //     xml: {
-    //         withDomLvl1: true,
-    //         normalizeWhitespace: false,
-    //         xmlMode: true,
-    //         decodeEntities: true
-    //     }
-    // });
+        console.log('Started _autoprefixer')
+        console.log(path.resolve( `${websitePath}/css`));
+        console.log('_autoprefixer done = ' , await _autoprefixer(path.resolve(`${websitePath}/css`), path.resolve(`${websitePath}/css`)))
 
-    let $ = cheerio.load(htmlString, { decodeEntities: false });
+        console.log('Started imgOPtimizer')
+        console.log(path.resolve( `${websitePath}/img`));
+        console.log('imgOptimizer done = ' , await _compressImages(
+            path.resolve(`${websitePath}/img`),
+            ['jpg', 'jpeg', 'JPG', 'JPEG', 'PNG'],
+            path.resolve(`${websitePath}/img_dist/prefix_`))
+        )
 
-    await imagesDirRename($, websiteAbsPath);
-    console.log('Hastst ended imagesDirRename function')
+        const imgDistPath = `${websitePath}/img_dist`
+        const distPathImgs = await getPathAllFiles(imgDistPath)
+        distPathImgs.map(async compressedImgName => {
+            const realImgName = compressedImgName.replace('prefix_', '');
+            const realOldImgPath = path.resolve(`${websitePath}/img/${realImgName}`);
 
-    // img alt=""
-    addImgAlts($)
+            console.log('delete realOldImgPath = ', realOldImgPath, await deleteFile(realOldImgPath));
 
-    // href value => {offer}
-    hrefToOffer($)
+            await moveFile(`${imgDistPath}/${compressedImgName}`, realOldImgPath);
+        })
+        // console.log('delete zipFilePath = ', zipFilePath, await deleteFile(zipFilePath))
 
-    // remove Favicons/Manifest/Author/
-    removeMetaInfo($)
 
-    const {nameReplacements} = options;
-    if (!!nameReplacements.length) {
-        const newHTML = await productRename($, nameReplacements);
-        if( !newHTML ){
-            throw "Something went wrong after product renaming."
-            return;
-        }
-        $ = cheerio.load(newHTML, { decodeEntities: false });
+
+        const isHtmlWroten = await writeFile(htmlPath, $.html());
+        console.log('wroten a HTML = ', isHtmlWroten);
+
+        const newZipDir = await zipDir(path.resolve(`${websitePath}/../website/`), path.resolve(`${websitePath}/../archive/exported.zip`) )
+        console.log("zipDir = ", newZipDir);
+
+        console.log('All was done');
+
+        return resolve(newZipDir)
+    }catch (e) {
+        log(e);
+        resolve(false)
     }
-
-    toComment($, 'script', 'noscript', 'input[type="hidden"]')
-
-    toEmptyFormTagActionAttr($);
-
-    removeAnchorTargetAttr($);
-
-    addJquery($)
-
-    const {hashToken} = options;
-    if (!!hashToken.length) {
-        addHashToken($, hashToken);
-    }
-
-    addCountryCode($)
-
-    console.log('Started _autoprefixer')
-    console.log(path.resolve( `${websitePath}/css`));
-    console.log('_autoprefixer done = ' , await _autoprefixer(path.resolve(`${websitePath}/css`), path.resolve(`${websitePath}/css`)))
-
-    console.log('Started imgOPtimizer')
-    console.log(path.resolve( `${websitePath}/img`));
-    console.log('imgOptimizer done = ' , await _compressImages(
-        path.resolve(`${websitePath}/img`),
-        ['jpg', 'jpeg', 'JPG', 'JPEG', 'PNG'],
-        path.resolve(`${websitePath}/img_dist/prefix_`))
-    )
-
-    const imgDistPath = `${websitePath}/img_dist`
-    const distPathImgs = await getPathAllFiles(imgDistPath)
-    distPathImgs.map(async compressedImgName => {
-        const realImgName = compressedImgName.replace('prefix_', '');
-        const realOldImgPath = path.resolve(`${websitePath}/img/${realImgName}`);
-
-        console.log('delete realOldImgPath = ', realOldImgPath, await deleteFile(realOldImgPath));
-
-        await moveFile(`${imgDistPath}/${compressedImgName}`, realOldImgPath);
-    })
-    // console.log('delete zipFilePath = ', zipFilePath, await deleteFile(zipFilePath))
-
-
-
-    const isHtmlWroten = await writeFile(htmlPath, $.html());
-    console.log('wroten a HTML = ', isHtmlWroten);
-
-    const newZipDir = await zipDir(path.resolve(`${projectDir}/website/`), path.resolve(`${projectDir}/archive/exported.zip`) )
-    console.log("zipDir = ", newZipDir);
-
-    console.log('All was done');
-
-    return resolve(newZipDir);
 })
 
 
