@@ -9,6 +9,8 @@ const {
     _images,
     _tinypng,
     _resize,
+    _autoprefixer,
+    _compressImages,
 } = require('../img');
 const concatCss = require('gulp-concat-css');
 const concat = require('gulp-concat');
@@ -16,10 +18,12 @@ const minify = require('gulp-minify');
 const cleanCSS = require('gulp-clean-css');
 const gulpuncss = require('gulp-uncss');
 const {log, deleteFile, scrapper, dirExists, writeFile, getPathAllFiles, fileExists, _makeDir} = require('../index');
-const {unZip} = require('../zip');
+const {unZip, zipDir} = require('../zip');
 const cheerio = require('cheerio')
 const redisQueue = require("../queue/redis");
 const indexAllowedTypes = ['index.php', 'index.html'];
+const moveFile = require('move-file');
+
 
 // Конкатенация css
 const _concatCss = () => gulp.src('./css/*.css')
@@ -41,7 +45,6 @@ const _compressJs = () => gulp.src(['./js/all.js'])
     .pipe(minify())
     .pipe(gulp.dest('js'))
 
-// require('./src/tools/htmlParser')
 
 const generateSelector = async (imagesPath = [], selectorTemplate = `img[src*='img/%s']`) => new Promise(resolve => {
     resolve(imagesPath.map(pathFile => selectorTemplate.replace('%s', pathFile)))
@@ -76,7 +79,8 @@ const addTask = async (task) => new Promise(async resolve => {
     try {
         const _addedTask = await doTask(task)
         // const _addedTask = await redisQueue.enqueue(task)
-        return resolve(!!_addedTask)
+        console.log('_addedTask = ', _addedTask);
+        return resolve(_addedTask)
     } catch (e) {
         log(e);
         return resolve(false)
@@ -115,8 +119,11 @@ const imagesDirRename = async ($, websiteAbsPath) => new Promise(async resolve =
         const cssPath = `${websiteAbsPath}/css`;
         const cssFilesPath = await getPathAllFiles(cssPath) // isRenamed == newPath
         console.log('cssFilesPath = ', cssFilesPath);
+        if(!cssFilesPath.length){
+            return resolve(true);
+        }
 
-        cssFilesPath.map(async cssFilePath => { // WHY map not forEach, for "async cssFilePath" not saying -"Please checkout from forEach to for_loop "
+        cssFilesPath.map(async (cssFilePath, index) => { // WHY map not forEach, for "async cssFilePath" not saying -"Please checkout from forEach to for_loop "
             try {
                 const curCssPath = `${cssPath}/${cssFilePath}`
 
@@ -127,13 +134,17 @@ const imagesDirRename = async ($, websiteAbsPath) => new Promise(async resolve =
 
                     const isCssWroted = await writeFile(curCssPath, updatedCss);
                     console.log('isCssWroted = ', isCssWroted, curCssPath);
+
+                    if(index === cssFilesPath.length - 1){
+                        console.log('Ended imagesDirRename refactor')
+                        resolve(true);
+                    }
                 }
             } catch (e) {
                 log(e);
+                console.log(e);
             }
         });
-
-        resolve(true)
     } catch (e) {
         log(e)
         throw e;
@@ -203,6 +214,7 @@ const doTask = async (options = {}) => new Promise(async resolve => {
     }
 
     let websitePath = '';
+    const projectDir = data;
     switch (type) {
         case 'url':
             const projectTemp = await scrapper({url: data})
@@ -237,7 +249,7 @@ const doTask = async (options = {}) => new Promise(async resolve => {
     })
     console.log('htmlPath = ',htmlPath)
 
-    const htmlString = fs.readFileSync(path.resolve('uploads/projects/newslentalj.com-vit2-feroctilfree-vsemir-525114465/website/index.html'));
+    const htmlString = fs.readFileSync(htmlPath);
 
     // const htmlparser2 = require('htmlparser2');
     // const dom = htmlparser2.parseDOM(htmlString, {
@@ -252,6 +264,7 @@ const doTask = async (options = {}) => new Promise(async resolve => {
     let $ = cheerio.load(htmlString, { decodeEntities: false });
 
     await imagesDirRename($, websiteAbsPath);
+    console.log('Hastst ended imagesDirRename function')
 
     // img alt=""
     addImgAlts($)
@@ -287,26 +300,46 @@ const doTask = async (options = {}) => new Promise(async resolve => {
 
     addCountryCode($)
 
+    console.log('Started _autoprefixer')
+    console.log(path.resolve( `${websitePath}/css`));
+    console.log('_autoprefixer done = ' , await _autoprefixer(path.resolve(`${websitePath}/css`), path.resolve(`${websitePath}/css`)))
+
+    console.log('Started imgOPtimizer')
+    console.log(path.resolve( `${websitePath}/img`));
+    console.log('imgOptimizer done = ' , await _compressImages(
+        path.resolve(`${websitePath}/img`),
+        ['jpg', 'jpeg', 'JPG', 'JPEG', 'PNG'],
+        path.resolve(`${websitePath}/img_dist/prefix_`))
+    )
+
+    const imgDistPath = `${websitePath}/img_dist`
+    const distPathImgs = await getPathAllFiles(imgDistPath)
+    distPathImgs.map(async compressedImgName => {
+        const realImgName = compressedImgName.replace('prefix_', '');
+        const realOldImgPath = path.resolve(`${websitePath}/img/${realImgName}`);
+
+        console.log('delete realOldImgPath = ', realOldImgPath, await deleteFile(realOldImgPath));
+
+        await moveFile(`${imgDistPath}/${compressedImgName}`, realOldImgPath);
+    })
+    // console.log('delete zipFilePath = ', zipFilePath, await deleteFile(zipFilePath))
+
+
+
     const isHtmlWroten = await writeFile(htmlPath, $.html());
     console.log('wroten a HTML = ', isHtmlWroten);
 
+    const newZipDir = await zipDir(path.resolve(`${projectDir}/website/`), path.resolve(`${projectDir}/archive/exported.zip`) )
+    console.log("zipDir = ", newZipDir);
+
     console.log('All was done');
+
+    return resolve(newZipDir);
 })
 
 
 module.exports = {
-    _webp,
-    _resizeWIthWidth,
-    _guetzli,
-    _mozjpeg,
-    _images,
-    _concatCss,
-    _concatJs,
-    _compressJs,
-    _tinypng,
-    _resize,
-    doTask,
-    addTask,
+    addTask
 };
 // console.log(gulp.start(
 //     'resize'

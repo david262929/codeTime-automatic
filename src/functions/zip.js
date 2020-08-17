@@ -25,7 +25,7 @@ const unZip = async (zipFileDir = '', pathToExtract = '') => new Promise(async r
 
 
 const zipDir = (pathToZip = '', newzipFileDir = '') => new Promise(async resolve => compressing.tar.compressDir(pathToZip, newzipFileDir).then(() => {
-    resolve(true)
+    resolve(newzipFileDir)
 }).catch((err) => {
     resolve(false)
     log(err)

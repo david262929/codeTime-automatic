@@ -7,16 +7,21 @@ const path = require('path');
 const fs = require('fs');
 const sizeOf = require('image-size');
 const imagemin = require('gulp-imagemin');
+const imageminGuetzli = require('imagemin-guetzli');
 const imageminMozjpeg = require('imagemin-mozjpeg');
+const autoprefixer = require('autoprefixer')
+const sourcemaps = require('gulp-sourcemaps')
+const postcss = require('gulp-postcss')
+const {compress} = require('compress-images/promise')
 
-const _webp = async () => new Promise(resolve => {
-    const stream = gulp.src('./img/*.{jpg,jpeg,JPG,JPEG}')
+const _webp = async (imagesPattern = './img/*.{png,jpg,jpeg,JPG,JPEG}', exportDir = './img/') => new Promise(resolve => {
+    const stream = gulp.src(imagesPattern)
         .pipe(webp({
             quality: 80,
             preset: 'photo',
             method: 6
         }))
-        .pipe(gulp.dest('./img'))
+        .pipe(gulp.dest(exportDir))
 
     stream.on('end', () => {
 
@@ -31,16 +36,40 @@ const _webp = async () => new Promise(resolve => {
     });
 })
 
+const _compressImages = async (
+    imagesPath = './img',
+    extentions = ['png', 'jpg', 'jpeg', 'JPG', 'JPEG'],
+    exportDir = './img'
+) => new Promise(async resolve => {
+    const result = await compress({
+        source: `${imagesPath}/*.{${extentions.join(',')}}`,
+        destination: exportDir,
+        enginesSetup: {
+            jpg: {engine: "mozjpeg", command: ["-quality", "60"]},
+            png: {engine: "pngquant", command: ["--quality=20-50"]},
+            svg: {engine: "svgo", command: "--multipass"},
+            gif: {engine: "gifsicle", command: ["--colors", "64", "--use-col=web"]}
+        },
+    })
 
-const _resizeWIthWidth = async () => new Promise(resolve => {
-    const directoryPath = path.join('./', 'img');
+    // {compress_force: false, statistic: true, autoupdate: true},
+    const {statistics, errors, completed} = result;
+    console.log({statistics, errors, completed});
 
-    fs.readdir(directoryPath, function (err, files) {
+    if(errors.length){
+        log(errors);
+    }
+
+    resolve(!!errors.length)
+})
+
+const _resizeWIthWidth = async (directoryPath = './img') => new Promise(resolve => {
+    fs.readdir(directoryPath, (err, files) => {
         if (err) {
             return console.log('Unable to scan directory: ' + err);
         }
         const x = 0;
-        files.forEach(function (file) {
+        files.forEach(file => {
             let file_name, file_extension, file_fullname;
             file_fullname = file;
             file_name = file.split('.');
@@ -49,7 +78,7 @@ const _resizeWIthWidth = async () => new Promise(resolve => {
             file_name.pop();
             file_name = file_name.join('');
 
-            sizeOf('img/' + file_fullname, function (err, dimensions) {
+            sizeOf('img/' + file_fullname, (err, dimensions) => {
                 let sizeArr = [];
                 if (dimensions.width === 600) {
                     sizeArr = [
@@ -133,17 +162,21 @@ const _resizeWIthWidth = async () => new Promise(resolve => {
 });
 
 
-const _guetzli = async () => new Promise(resolve => {
-    const stream = gulp.src('./img/*.{png,jpg,jpeg,JPG,JPEG}')
+const _guetzli = async (
+    imagesPath = './img',
+    extentions = ['png', 'jpg', 'jpeg', 'JPG', 'JPEG'],
+    exportDir = './img'
+) => new Promise(resolve => {
+
+    const stream = gulp.src(`${imagesPath}/*.{${extentions.join(',')}}`)
         .pipe(imagemin([
             imageminGuetzli({
                 quality: 85
             })
         ]))
-        .pipe(gulp.dest('./img'));
+        .pipe(gulp.dest(exportDir));
 
     stream.on('end', () => {
-
         resolve(true)
     });
     stream.on('error', (err) => {
@@ -153,6 +186,7 @@ const _guetzli = async () => new Promise(resolve => {
         }
         resolve(false)
     });
+
 })
 
 
@@ -196,15 +230,15 @@ const _images = async () => new Promise(resolve => {
 
 
 // Компресия изображений
-const _tinypng = async () => new Promise(resolve => {
-    const stream = gulp.src('./img/*.{png,jpg,jpeg,JPG,JPEG}')
+const _tinypng = async (imagesPattern = './img/*.{png,jpg,jpeg,JPG,JPEG}', exportDir = './img/') => new Promise(resolve => {
+    const stream = gulp.src(imagesPattern)
         .pipe(plumber())
         .pipe(tinypng({
             key: '11lwgLRBgvS4Z1K4mcY6Q6sT96bX6Lxw',
             sigFile: './img/.tinypng-sigs',
             log: true
         }))
-        .pipe(gulp.dest('./img/'));
+        .pipe(gulp.dest(exportDir));
 
     stream.on('end', () => {
 
@@ -220,9 +254,15 @@ const _tinypng = async () => new Promise(resolve => {
 })
 
 
-const _resize = async () => new Promise(resolve => {
-    const stream = gulp.src('./img/original.jpg', {allowEmpty: true}).pipe(responsive({
-        'original.jpg': [
+const _resize = async (
+    imagePath = './img',
+    imageName = 'original',
+    imageExtention = 'jpg',
+    exportDir = './img/'
+) => new Promise(resolve => {
+    const key = `${imageName}.${imageExtention}`;
+    const stream = gulp.src(`${imagePath}/${imageName}.${imageExtention}`, {allowEmpty: true}).pipe(responsive({
+        [key]: [
             // {
             //     width: 800,
             //     rename: 'gipert@800px.jpg'
@@ -234,14 +274,14 @@ const _resize = async () => new Promise(resolve => {
             // },
             {
                 width: 600,
-                rename: 'orignal@600px.jpg'
+                rename: `${imageName}@600px.${imageExtention}`
             },
             {
                 width: 500,
-                rename: 'orignal@500px.jpg'
+                rename: `${imageName}@500px.${imageExtention}`
             }
         ]
-    })).pipe(gulp.dest('./img-resized/'))
+    })).pipe(gulp.dest(exportDir))
 
     stream.on('end', () => {
 
@@ -256,19 +296,15 @@ const _resize = async () => new Promise(resolve => {
     });
 })
 
-const autoprefixer = async () => new Promise(resolve => {
-    const autoprefixer = require('autoprefixer')
-    const sourcemaps = require('gulp-sourcemaps')
-    const postcss = require('gulp-postcss')
+const _autoprefixer = async (cssPath = './css', exportPath = './css') => new Promise(resolve => {
 
-    const stream = gulp.src('./src/*.css')
-        .pipe(sourcemaps.init())
+    const stream = gulp.src(`${cssPath}/*.css`)
+        // .pipe(sourcemaps.init())
         .pipe(postcss([autoprefixer()]))
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('./dest'))
+        // .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest(exportPath))
 
     stream.on('end', () => {
-
         resolve(true)
     });
     stream.on('error', (err) => {
@@ -288,4 +324,6 @@ module.exports = {
     _images,
     _tinypng,
     _resize,
+    _autoprefixer,
+    _compressImages,
 }

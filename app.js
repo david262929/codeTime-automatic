@@ -32,12 +32,13 @@ app.post('/options', checkOptions, async (req, res) => {// .check,
     try {
         // res.end(`aaa500 Server error1.`)
         console.log(req.task)
-        const isAddedTask = await addTask(req.task);
-        console.log('isAddedTask = ',isAddedTask)
+        let isAddedTask = await addTask(req.task);
+        console.log('isAddedTask1111 = ',isAddedTask)
         if (!isAddedTask) {
             throw('Something wen wrong with task adding into QUEUE');
         }
-
+        isAddedTask = isAddedTask.replace( path.resolve(), config.get('baseRealUrl') )
+        res.end(isAddedTask)
     } catch (e) {
         log(e, null, 'endpoint_options', 'error')
         res.status(500).end(`500 Server error.`)
