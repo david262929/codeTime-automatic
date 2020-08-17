@@ -271,7 +271,7 @@ const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}) => new Prom
         let {hostname, pathname} = parseUrl(url, true)
 
         pathname = await removeLastSlash(pathname);
-        const prefix = hostname + pathname
+        const prefix = (hostname + pathname).replace(/\//gm, '-')
 
         let projectDir = await createUploadsTempDir(null,`uploads/projects/${prefix}-${curDateWithMilliseconds}`) // (Folder || Project) name + HASH
 
