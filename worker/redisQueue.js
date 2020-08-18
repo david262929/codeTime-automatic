@@ -1,5 +1,5 @@
 const {worker: redisQueue} = require("../src/functions/queue/redis");
-const {log} = require("../src/functions");
+const {log} = require("../src/functions/automatic.functions");
 const doTask = require("../src/functions/tools/index");
 
 const _function = data => new Promise(async resolve => {

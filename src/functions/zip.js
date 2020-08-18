@@ -4,7 +4,7 @@ const compressing = require('compressing')
 const extract = require('extract-zip')
 
 const node_ratify = require('node-ratify')
-const {createUploadsTempDir, _makeDir, log, haveExtention} = require('./index')
+const {createUploadsTempDir, _makeDir, log, haveExtention} = require('./automatic.functions')
 
 let dest = `uploads/projects/`;
 (async () => {

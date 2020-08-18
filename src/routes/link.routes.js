@@ -1,7 +1,7 @@
 const {Router} = require('express')
 const config = require('config')
 const shortid = require('shortid')
-const auth = require('../functions/middleware/auth.middleware')
+const auth = require('../middleware/auth.middleware')
 const Link = require('../models/Link')
 const router = Router()
 
@@ -11,21 +11,21 @@ router.post('/generate', auth, async (req, res) => {
         const {from} = req.body
 
         const existing = await Link.findOne({from});
-        if (existing) {
-            res.json({link: existing})
+        if(existing){
+            res.json({link : existing})
         }
 
         const code = shortid.generate()
         const to = `${baseUrl}/t/${code}`
 
-        const link = new Link({
+        const  link = new Link({
             code, to, from, owner: req.user.userId
         })
 
         await Link.save()
 
         res.status(201).json({
-            message: "You have successfully shorted a link",
+            message : "You have successfully shorted a link",
             link,
         })
 
@@ -37,7 +37,7 @@ router.post('/generate', auth, async (req, res) => {
 
 router.get('/', auth, async (req, res) => {
     try {
-        const links = await Link.find({owner: req.user.userId})
+        const links = await Link.find({ owner : req.user.userId  })
         res.json(links)
 
 

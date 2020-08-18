@@ -1,7 +1,7 @@
 const path = require('path')
 const fs = require('fs')
 const config = require('config')
-const {log, haveExtention, isUrlWorking, createUploadsTempDir} = require('../index')
+const {log, haveExtention, isUrlWorking, createUploadsTempDir} = require('../functions/automatic.functions')
 
 // unZip( path.resolve('uploads/projects/test-project/archive/archive.zip'), path.resolve('uploads/projects/test-project/website/') )
 // zipDir(path.resolve('uploads/projects/test-project/website/'), path.resolve('uploads/projects/test-project/archive/archive3.zip') )

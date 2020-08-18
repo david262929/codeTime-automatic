@@ -102,20 +102,34 @@
 //
 // $('html').html(curState);
 // console.log($('html').html());
-const path = require('path');
-const {_compressImages} = require('./src/functions/img/index')
-console.log(path.resolve('./uploads/toScrapp/img'));
-
-const x = async () => {
-    console.log('_compressImages done = ', await _compressImages(
-
-        path.resolve('./uploads/toScrapp/img'),
-        ['png', 'jpg', 'jpeg', 'JPG', 'JPEG'],
-        path.resolve('./uploads/toScrapp/img_dist/img_dist')
-    ))
-}
-x();
+// const path = require('path');
+// const {_compressImages} = require('./src/functions/img/index')
+// console.log(path.resolve('./uploads/toScrapp/img'));
+//
+// const x = async () => {
+//     console.log('_compressImages done = ', await _compressImages(
+//
+//         path.resolve('./uploads/toScrapp/img'),
+//         ['png', 'jpg', 'jpeg', 'JPG', 'JPEG'],
+//         path.resolve('./uploads/toScrapp/img_dist/img_dist')
+//     ))
+// }
+// x();
 
 // require('./worker/sayHello')
     // productRename($, nameReplacements);
 // }
+const path = require('path');
+const fs = require('fs');
+const {_autoprefixer} = require('./src/functions/img/index.js')
+
+const websitePath = path.resolve('./uploads/projects/test-delete-aaaa-1597684539796/website');
+
+console.log('websitePath = ', websitePath);
+
+const x = async () => {
+    console.log('Started _autoprefixer')
+    console.log(path.resolve( `${websitePath}/css`));
+    console.log('_autoprefixer done = ' , await _autoprefixer(path.resolve(`${websitePath}/css`), path.resolve(`${websitePath}/css`)))
+}
+x();

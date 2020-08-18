@@ -1,0 +1,14 @@
+<%- include('components/header') %>
+
+<%
+    components.forEach( component => {
+        const {viewPathName, data} = component;
+%>
+    <%- include(viewPathName, {data}) %>
+<%
+    })
+%>
+<!--<h1>Automatic</h1>-->
+
+<%- include('components/footer') %>
+

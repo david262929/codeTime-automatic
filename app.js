@@ -5,8 +5,8 @@ const upload = require('express-fileupload')
 const cors = require('cors')
 const path = require('path')
 const config = require('config')
-const checkOptions = require('./src/functions/middleware/checkOptions')
-const {log} = require('./src/functions')
+const checkOptions = require('./src/middleware/checkOptions')
+const {log} = require('./src/functions/automatic.functions')
 const {addTask} = require('./src/functions/task')
 
 const app = express()
@@ -22,7 +22,10 @@ app.use(express.static('./dist'))
 
 app.use('/uploads', express.static(path.join(__dirname + '/uploads')))
 app.use(express.static('./logs'))
+const notify = require('./src/functions/telegram.notify.js');
 
+app.use('/', require('./src/routes/main.routes'));
+// app.use('/api/link', require('./src/routes/link.routes'));
 
 // // app.use(express.static('./uploads'))
 //
@@ -38,37 +41,14 @@ app.post('/options', checkOptions, async (req, res) => {// .check,
             throw('Something wen wrong with task adding into QUEUE');
         }
         isAddedTask = isAddedTask.replace( path.resolve(), config.get('baseRealUrl') )
+
+        // await notify(589781832, isAddedTask);
+
         res.end(isAddedTask)
     } catch (e) {
         log(e, null, 'endpoint_options', 'error')
         res.status(500).end(`500 Server error.`)
     }
-})
-
-// app.get('/upload', (req, res) => {
-//     res.end(`
-//         <a href="../">Home</a>
-//         <br>
-//         <a href="./about">About</a>
-//         <h1>Upload Page</h1>
-//         <br>
-//         <br>
-//         <br>
-//         <form action="/" method="POST" enctype="multipart/form-data">
-//             <input type="file" name="file" required/>
-//             <input type="submit" value="Upload" />
-//         </form>
-//     `)
-// })
-
-app.get("/", async (req, res) => {
-    res.render("options");
-    // await scrapper({url : `http://newslentalj.com/vit2/feroctilfree/vsemir/`})
-
-    // console.log('111111111')
-    // console.log()
-    // console.log('111111111')
-    // res.render("image", { url: file.path, name: file.filename, ext: ext })
 })
 
 

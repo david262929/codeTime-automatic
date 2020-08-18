@@ -12,7 +12,9 @@ const imageminMozjpeg = require('imagemin-mozjpeg');
 const autoprefixer = require('autoprefixer')
 const sourcemaps = require('gulp-sourcemaps')
 const postcss = require('gulp-postcss')
-const {compress} = require('compress-images/promise')
+const {log, deleteFile, getPathAllFiles} = require('../automatic.functions');
+const {compress} = require('compress-images/promise');
+const moveFile = require('move-file');
 
 const _webp = async (imagesPattern = './img/*.{png,jpg,jpeg,JPG,JPEG}', exportDir = './img/') => new Promise(resolve => {
     const stream = gulp.src(imagesPattern)
@@ -56,7 +58,7 @@ const _compressImages = async (
     const {statistics, errors, completed} = result;
     console.log({statistics, errors, completed});
 
-    if(errors.length){
+    if (errors.length) {
         log(errors);
     }
 
@@ -296,16 +298,36 @@ const _resize = async (
     });
 })
 
-const _autoprefixer = async (cssPath = './css', exportPath = './css') => new Promise(resolve => {
+const moveFilesFromDirOnReplaceMode = (fromDir, toDir) => new Promise(async resolve => {
+    const distPathFiles = await getPathAllFiles(fromDir);
 
+    if (!distPathFiles.length) {
+        resolve(true);
+    }
+
+    distPathFiles.map(async (compressedFileName, index) => {
+        const realOldFilePath = path.resolve(`${toDir}/${compressedFileName}`);
+
+        console.log('delete realOldFIlePath = ', realOldFilePath, await deleteFile(realOldFilePath));
+
+        console.log('new File Moves realOldFIlePath = ', await moveFile(`${fromDir}/${compressedFileName}`, realOldFilePath));
+
+        if (index === distPathFiles.length) {
+            resolve(true);
+        }
+    })
+})
+
+const _autoprefixer = async (cssPath = './css', exportPath = './css') => new Promise(resolve => {
+    const tempExportPath = exportPath + '/css_minified'
     const stream = gulp.src(`${cssPath}/*.css`)
         // .pipe(sourcemaps.init())
         .pipe(postcss([autoprefixer()]))
         // .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(exportPath))
+        .pipe(gulp.dest(tempExportPath))
 
-    stream.on('end', () => {
-        resolve(true)
+    stream.on('end', async () => {
+        await moveFilesFromDirOnReplaceMode( tempExportPath, cssPath )
     });
     stream.on('error', (err) => {
         if (err) {
