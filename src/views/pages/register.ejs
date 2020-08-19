@@ -1,0 +1,42 @@
+<div class="container bg-secondary p-3" id="register">
+    <h1>Register</h1>
+    <form method="post" action="/register" enctype="multipart/form-data">
+        <style>
+            .form-group {
+                padding: 10px;
+            }
+        </style>
+        <div class="form-group p-3 cool-shadow bg-dark">
+            <label>Full Name</label>
+            <input type="text" class="form-control bg-dark text-white rounded-0" name="fullName"
+                   placeholder="Enter your Full Name" required>
+        </div>
+        <div class="form-group p-3 cool-shadow bg-dark">
+            <label>Email</label>
+            <input type="email" class="form-control bg-dark text-white rounded-0" name="email"
+                   placeholder="Enter your email" required>
+        </div>
+        <div class="form-group p-3 cool-shadow bg-dark">
+            <label>Password</label>
+            <input type="password" class="form-control bg-dark text-white rounded-0" name="password"
+                   placeholder="Create password email" required>
+        </div>
+        <div class="form-group p-3 cool-shadow bg-dark">
+            <label>Retype Password</label>
+            <input type="password" class="form-control bg-dark text-white rounded-0" name="rePassword"
+                   placeholder="Retype a password" required>
+        </div>
+        <button type="submit" class="btn btn-light cool-shadow p-2-3">Register</button>
+    </form>
+    <script>
+        const form = document.querySelector('#register form')
+        const pswd = form.querySelector('input[name="password"]')
+        const rePswd = form.querySelector('input[name="rePassword"]')
+        form.addEventListener('submit', event => {
+            if(pswd.value !== rePswd.value){
+                event.preventDefault()
+                return false;
+            }
+        })
+    </script>
+</div>
