@@ -1,20 +1,25 @@
 <div class="container p-0" style="margin-bottom: 10vh">
-    <nav class="navbar navbar-expand-lg bg-secondary navbar-light cool-shadow ">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+    <nav class="navbar navbar-expand-lg bg-secondary navbar-light cool-shadow p-0">
+        <button class="navbar-toggler  m-2" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
+            <ul class="navbar-nav mx-auto">
                 <% data.buttons.forEach(function(button){ %>
-                    <li class="nav-item <% if (button.href === data.active) { %> active <% } %> ">
-                        <a class="nav-link text-white lead" href="<%= button.href %>">
+                    <li class="nav-item p-2 <% if (button.href === data.active) { %> active cool-shadow<% } %> " style="margin: 0 10px;">
+                        <a class="nav-link text-white lead p-0" href="<%= button.href %>">
                             <%=button.text%>
                         </a>
                     </li>
                 <% }); %>
             </ul>
         </div>
+        <style>
+            #navbarSupportedContent .nav-item:hover{
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            }
+        </style>
     </nav>
 </div>
