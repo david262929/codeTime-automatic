@@ -9,10 +9,6 @@ const router = Router();
 
 const auth = require('../middleware/auth.middleware')
 
-// /api/auth/register
-
-// router.get('/login', auth, )
-
 const generateNavbarData = (active = '/') => ({
     active,
     buttons : [
@@ -53,22 +49,12 @@ router.get('/',  async (req, res) => {
             }
         ]
     });
-    // await scrapper({url : `http://newslentalj.com/vit2/feroctilfree/vsemir/`})
-    // res.render("image", { url: file.path, name: file.filename, ext: ext })
 })
 
 
 
 router.get("/automatic", async (req, res) => {
     console.log(req._parsedUrl.pathname)
-    // res.render("main",  {
-    //     data : {
-    //         navbar : generateNavbarData(req._parsedUrl.pathname)
-    //     }
-    // });
-    // res.render("automatic");
-    // await scrapper({url : `http://newslentalj.com/vit2/feroctilfree/vsemir/`})
-    // res.render("image", { url: file.path, name: file.filename, ext: ext })
 })
 
 
