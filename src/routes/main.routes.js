@@ -42,10 +42,6 @@ router.get('/',  async (req, res) => {
             {
                 viewPathName : 'components/navbar',
                 data : generateNavbarData(req._parsedUrl.pathname)
-            },
-            {
-                viewPathName : 'components/automatic',
-                data : 'davo_ davo _davo'
             }
         ]
     });
@@ -54,7 +50,48 @@ router.get('/',  async (req, res) => {
 
 
 router.get("/automatic", async (req, res) => {
-    console.log(req._parsedUrl.pathname)
+    res.render("main",  {
+        components : [
+            {
+                viewPathName : 'components/navbar',
+                data : generateNavbarData(req._parsedUrl.pathname)
+            },
+            {
+                viewPathName : 'pages/automatic',
+                data : 'davo_ davo _davo'
+            }
+        ]
+    });
+})
+
+router.get("/login", async (req, res) => {
+    res.render("main",  {
+        components : [
+            {
+                viewPathName : 'components/navbar',
+                data : generateNavbarData(req._parsedUrl.pathname)
+            },
+            {
+                viewPathName : 'pages/login',
+                data : 'davo_ davo _davo'
+            }
+        ]
+    });
+})
+
+router.get("/register", async (req, res) => {
+    res.render("main",  {
+        components : [
+            {
+                viewPathName : 'components/navbar',
+                data : generateNavbarData(req._parsedUrl.pathname)
+            },
+            {
+                viewPathName : 'pages/register',
+                data : 'davo_ davo _davo'
+            }
+        ]
+    });
 })
 
 
