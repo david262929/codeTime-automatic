@@ -1,4 +1,6 @@
 const {Router} = require('express');
+const path = require('path');
+const fs = require('fs');
 // const {check, validationResult} = require('express-validator')
 
 // const bcrypt = require('bcryptjs');
@@ -35,13 +37,23 @@ const generateNavbarData = (active = '/') => ({
     ]
 })
 
+const generateMarkdownHTML = () => {
+    const md = require('markdown-it')();
+    const readmePathName = path.resolve('README.md');
+    const readmeContent = fs.readFileSync(readmePathName , {"encoding": "utf8", "flag": "r"} )
+    return md.render( readmeContent );
+}
+
 router.get('/',  async (req, res) => {
-    console.log(req)
     res.render("main",  {
         components : [
             {
                 viewPathName : 'components/navbar',
                 data : generateNavbarData(req._parsedUrl.pathname)
+            },
+            {
+                viewPathName : 'pages/home',
+                data : generateMarkdownHTML()
             }
         ]
     });
