@@ -22,7 +22,7 @@ app.use(express.static('./dist'))
 
 app.use('/uploads', express.static(path.join(__dirname + '/uploads')))
 app.use(express.static('./logs'))
-// const notify = require('./src/functions/telegram.notify.js');
+const notify = require('./src/functions/telegram.notify.js');
 
 app.use('/', require('./src/routes/auth.routes'));
 app.use('/', require('./src/routes/main.routes'));
@@ -37,13 +37,13 @@ app.post('/options', checkOptions, async (req, res) => {// .check,
         // res.end(`aaa500 Server error1.`)
         console.log(req.task)
         let isAddedTask = await addTask(req.task);
-        console.log('isAddedTask1111 = ',isAddedTask)
+        console.log('isAddedTask1111 = ', isAddedTask)
         if (!isAddedTask) {
             throw('Something wen wrong with task adding into QUEUE');
         }
 
-        // await notify(589781832, 'isAddedTask = ' + (isAddedTask ? 'true' : 'false') );
-        res.end('isAddedTask = ' + (isAddedTask ? 'true' : 'false' ))
+        await notify(589781832, 'isAddedTask = ' + isAddedTask );
+        res.end('isAddedTask = ' + isAddedTask)
     } catch (e) {
         log(e, null, 'endpoint_options', 'error')
         res.status(500).end(`500 Server error.`)

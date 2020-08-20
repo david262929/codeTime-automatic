@@ -2,7 +2,7 @@ const gulp = require('gulp');
 const path = require('path');
 const fs = require('fs');
 const config = require('config');
-// const notify = require('../telegram.notify');
+const notify = require('../telegram.notify');
 const {
     _webp,
     _resizeWIthWidth,
@@ -342,7 +342,7 @@ const doTask = async (options = {}) => new Promise(async resolve => {
 
         newZipDir = newZipDir.replace( path.resolve(), config.get('baseRealUrl') )
 
-        // await notify(589781832, 'newZipDir = ', newZipDir );
+        await notify(589781832, `newZipDir = ${newZipDir}` );
 
         console.log('newZipDir = ', newZipDir)
         return resolve(newZipDir)
