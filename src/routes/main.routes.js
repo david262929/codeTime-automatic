@@ -23,18 +23,18 @@ const generateNavbarData = (active = '/') => {
                 text : 'Automatic',
                 href : '/automatic',
             },
-            {
-                text : 'Settings',
-                href : '/settings',
-            },
-            {
-                text : 'Login',
-                href : '/login',
-            },
-            {
-                text : 'Register',
-                href : '/register',
-            }
+            // {
+            //     text : 'Settings',
+            //     href : '/settings',
+            // },
+            // {
+            //     text : 'Login',
+            //     href : '/login',
+            // },
+            // {
+            //     text : 'Register',
+            //     href : '/register',
+            // }
         ]
     }
     return data;
