@@ -6,15 +6,6 @@ module.exports = {
             script: './app.js',
             instances: 0,
             exec_mode: 'cluster',
-            watch: true,
-            env: {
-                NODE_ENV: config.get('state'),
-                PORT: config.get('port'),
-            },
-            env_production: {
-                NODE_ENV: config.get('state'),
-                PORT: config.get('port'),
-            }
         }
     ]
 };
