@@ -1,11 +1,12 @@
-const config = require('config')
 module.exports = {
     apps: [
         {
             name: 'CodeTime_Automatic',
             script: './app.js',
-            instances: 0,
-            exec_mode: 'cluster',
+            instance_var: process.env.pm_id ,
+            "instances": 6,
+            "instance_id_env": "NODE_APP_INSTANCE",
+            "exec_mode": "fork",
         }
     ]
 };
