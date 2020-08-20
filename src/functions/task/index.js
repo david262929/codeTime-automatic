@@ -341,7 +341,8 @@ const doTask = async (options = {}) => new Promise(async resolve => {
 
         newZipDir = newZipDir.replace( path.resolve(), config.get('baseRealUrl') )
 
-        await notify(589781832, `newZipDir = ${newZipDir}` );
+        const {telegramID} = options;
+        await notify(telegramID, `newZipDir = ${newZipDir}` );
 
         console.log('newZipDir = ', newZipDir)
         return resolve(newZipDir)

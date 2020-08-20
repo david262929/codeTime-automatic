@@ -11,10 +11,17 @@ module.exports = async (req, res, next) => new Promise( async resolve => {
     try {
         const task = {};
 
+        const {telegramID} = req.body
+        if (!telegramID) {
+            return res.end(`telegramID not passed`);
+        }
+        task.telegramID = telegramID;
+
         const {taskName} = req.body
         if (!taskName) {
             return res.end(`taskName not passed`);
         }
+
         task.name = taskName;
 
         const {starterSelector} = req.body;
