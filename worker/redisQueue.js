@@ -1,9 +1,13 @@
 const {worker: redisQueue} = require("../src/functions/queue/redis");
 const {log} = require("../src/functions/automatic.functions");
-const doTask = require("../src/functions/tools/index");
+const doTask = require("../src/functions/task/index");
 
 const _function = data => new Promise(async resolve => {
-    await doTask(JSON.parse(data))
+    try{
+        await doTask(JSON.parse(data))
+    }catch(e){
+        log( e.toString(), null, 'worker_tasks', 'error')
+    }
     resolve()
 })
 
