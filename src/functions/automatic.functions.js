@@ -308,6 +308,14 @@ const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}, projectName
     }
 })
 
+
+
+const getDirName = (fullPath) => {
+    const splitedPath = fullPath.split('/');
+    const lastElement = splitedPath.pop();
+    return lastElement === '' ? splitedPath.pop() : lastElement;
+}
+
 module.exports = {
     _makeDir,
     fileExists,
@@ -324,4 +332,5 @@ module.exports = {
     writeFile,
     getPathAllFiles,
     copyFile,
+    getDirName,
 }
