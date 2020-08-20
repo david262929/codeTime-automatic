@@ -1,165 +1,152 @@
 <div class="container bg-secondary p-3">
 
+  <style>
+    * {
+      transition: .5s ease;
+    }
 
-    <h1>Automatic</h1>
-    <style>
-        * {
-            transition: .5s ease;
-        }
+    .hide {
+      display: none;
+    }
 
-        .hide {
-            display: none;
-        }
+    .show {
+      display: block;
+    }
 
-        .show {
-            display: block;
-        }
-    </style>
+    .flex {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+  </style>
 
-    <script>
-        const hide = el => {
-            el.classList.add('hide');
-            el.classList.remove('show');
-        }
-        const show = el => {
-            el.classList.remove('hide');
-            el.classList.add('show');
-        }
-    </script>
+  <script>
+    const hide = el => {
+      el.classList.add('hide');
+      el.classList.remove('show');
+    }
+    const show = el => {
+      el.classList.remove('hide');
+      el.classList.add('show');
+    }
+  </script>
 
 
-    <form method="post" action="/options" enctype="multipart/form-data">
-        <style>
-            .form-group {
-                padding: 10px;
-            }
-        </style>
-        <div class="form-group p-3 cool-shadow bg-dark">
-            <label>Your Telegram ID</label>
-            <input type="number" class="form-control bg-dark text-white rounded-0" name="telegramID"
-                   placeholder="Paste Your Telegram. Got from BOT." required>
+  <form method="post" action="/options" enctype="multipart/form-data">
+    <div class="card-panel">
+      <div class="row flex">
+        <div class="col s6">
+          <div class="input-field">
+            <input id="telegramID" type="number" class="validate" name="telegramID" required>
+            <label for="telegramID">Your Telegram ID</label>
+            <span class="helper-text" data-error="wrong" data-success="right">
+              Paste Your <a href="https://t.me/codeTimeAutomaticNotifier_Bot" target="_blank">Telegram ID</a>
+            </span>
+          </div>
         </div>
-        <div class="form-group p-3 cool-shadow bg-dark">
-            <label>Name</label>
-            <input type="text" class="form-control bg-dark text-white rounded-0" name="taskName"
-                   placeholder="Enter a project/task name" required>
+        <div class="col s6">
+          <div class="input-field">
+            <input id="taskName" type="text" class="validate" name="taskName" required>
+            <label for="taskName">Project name</label>
+            <span class="helper-text" data-error="wrong" data-success="right">Write your project name</span>
+          </div>
         </div>
-        <div class="form-group p-3 cool-shadow bg-dark" style="display: flex;flex-direction: row;justify-content: space-between;width: 100%;">
-            <div class="option">
-                <select class="form-control bg-dark text-white rounded-0" id="exampleFormControlSelect1"
-                        name="starterSelector" required>
-                    <option value="upload" selected>Upload</option>
-                    <option value="url">Url</option>
-                </select>
+        <div class="col s3">
+          <div class="input-field">
+            <div class="switch">
+              <label>
+                Website URL
+                <input id="zipOrUrl" type="checkbox">
+                <span class="lever"></span>
+                Upload ZIP file
+              </label>
             </div>
-
-            <div class="upload-url">
-                <div class="upload" data-target-checkout="upload">
-                    <input type="file" class="form-control-file  bg-dark text-white rounded-0" name="zipFile"
-                           placeholder="Upload zip"
-                           accept=".zip" required>
-                </div>
-                <div class="url hide" data-target-checkout="url">
-                    <input type="text" class="form-control  bg-dark text-white rounded-0" id="formGroupExampleInput"
-                           placeholder="Paste your url"
-                           name="toScrappUrl">
-                </div>
-            </div>
-            <script>
-                (() => {
-                    const upload = document.querySelector('[data-target-checkout="upload"]'),
-                        uploadInput = upload.querySelector('input'),
-                        url = document.querySelector('[data-target-checkout="url"]'),
-                        urlInput = url.querySelector('input')
-
-                    document.querySelector('#exampleFormControlSelect1').addEventListener('change', event => {
-                        switch (event.target.value) {
-                            case 'upload':
-                                uploadInput.setAttribute('required', 'required')
-                                urlInput.removeAttribute('required')
-                                show(upload);
-                                hide(url);
-                                break;
-                            case 'url':
-                                uploadInput.removeAttribute('required')
-                                urlInput.setAttribute('required', 'required')
-                                hide(upload);
-                                show(url);
-                                break;
-                        }
-                    })
-                })()
-            </script>
+          </div>
         </div>
-        <div class="form-group p-3 cool-shadow bg-dark">
+        <div class="col s9">
+          <div class="input-field " id="checkout-url">
+            <input id="toScrappUrl" type="text" class="validate" name="toScrappUrl" required>
+            <label for="toScrappUrl">URL web site</label>
+          </div>
+          <div class="file-field input-field hide" id="checkout-upload">
+            <div class="btn">
+              <span>Zip file</span>
+              <input type="file" multiple>
+            </div>
+            <div class="file-path-wrapper">
+              <input class="file-path validate" type="text" placeholder="Upload one or more zip files" accept=".zip">
+            </div>
+          </div>
+        </div>
+        <div class="col s12">
+          <div class="input-field">
+            <select name="department">
+              <option value="" disabled selected>Choose your Department</option>
+              <option value="vitrina">Vitrina</option>
+              <option value="lpl">LPL</option>
+              <option value="msk">MSK</option>
+            </select>
             <label>Department</label>
-            <div class="option">
-                <select data-style="btn-dark" class="form-control selectpicker border  bg-dark text-white rounded-0"
-                        name="department" searchable="Search here.." data-live-search="true" multiple
-                        data-min-options="1">
-                    <option data-tokens="vitrina" value="vitrina" selected>Vitrina</option>
-                </select>
-            </div>
+          </div>
         </div>
-        <div class="form-group p-3 cool-shadow bg-dark">
-            <label>Product Name for replacement</label>
-            <div class="option" id="productNameReplacement">
-                <div class="row" style="align-items: center;">
-                    <div class="col">
-                        <input type="text" class="form-control  bg-dark text-white rounded-0" name="productOldName"
-                               placeholder="Enter an old product name">
-                    </div>
-                    ->
-                    <div class="col">
-                        <input type="text" class="form-control bg-dark text-white rounded-0" name="productNewName"
-                               placeholder="Enter an new product name">
-                    </div>
-                </div>
-            </div>
-            <script>
-                (() => {
-                    const oldNameInput = document.querySelector(`#productNameReplacement input[name='productOldName']`)
-                    const newNameInput = document.querySelector(`#productNameReplacement input[name='productNewName']`)
-                    oldNameInput.addEventListener('input', () => oldNameInput.value === '' ? newNameInput.removeAttribute('required') : newNameInput.setAttribute('required', 'required'))
-                })()
-            </script>
-        </div>
-        <div class="form-group p-3 cool-shadow bg-dark">
-            <label>Package(s) attach</label>
-            <div class="option" id="packageAttach">
-                <style>
-                    #packageAttach .dropdown-menu li.selected {
-                        background-color: #007bff;
-                    }
+      </div>
+    </div>
 
-                    #packageAttach .dropdown-menu li:hover a.dropdown-item {
-                        transform: scale(.95);
-                    }
-
-                    #packageAttach .dropdown-menu li a.dropdown-item:hover {
-                        background-color: unset;
-                    }
-                </style>
-                <select data-style="btn-dark" class="form-control selectpicker border  bg-dark text-white rounded-0"
-                        name="packages" searchable="Search here.." data-live-search="true" multiple>
-                    <option data-tokens="price" value="price">Price</option>
-                    <option data-tokens="translator" value="translator">Translator</option>
-                    <option data-tokens="datePicker" value="datePicker">Date picker</option>
-                </select>
-            </div>
+    <div class="form-group p-3 cool-shadow bg-dark">
+      <label>Product Name for replacement</label>
+      <div class="option" id="productNameReplacement">
+        <div class="row" style="align-items: center;">
+          <div class="col">
+            <input type="text" class="form-control  bg-dark text-white rounded-0" name="productOldName" placeholder="Enter an old product name">
+          </div>
+          ->
+          <div class="col">
+            <input type="text" class="form-control bg-dark text-white rounded-0" name="productNewName" placeholder="Enter an new product name">
+          </div>
         </div>
-        <div class="form-group p-3 cool-shadow bg-dark">
-            <label>Hash Token</label>
-            <div class="option">
-                <div class="row" style="align-items: center;">
-                    <div class="col">
-                        <input type="text" class="form-control  bg-dark text-white rounded-0" name="hashToken"
-                               placeholder="Enter a task HASH TOKEN" required>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
+      <script>
+        (() => {
+          const oldNameInput = document.querySelector(`#productNameReplacement input[name='productOldName']`)
+          const newNameInput = document.querySelector(`#productNameReplacement input[name='productNewName']`)
+          oldNameInput.addEventListener('input', () => oldNameInput.value === '' ? newNameInput.removeAttribute('required') : newNameInput.setAttribute('required', 'required'))
+        })()
+      </script>
+    </div>
+    <div class="form-group p-3 cool-shadow bg-dark">
+      <label>Package(s) attach</label>
+      <div class="option" id="packageAttach">
+        <style>
+          #packageAttach .dropdown-menu li.selected {
+            background-color: #007bff;
+          }
 
-        <button type="submit" class="btn btn-light cool-shadow p-2-3">DO</button>
-    </form>
+          #packageAttach .dropdown-menu li:hover a.dropdown-item {
+            transform: scale(.95);
+          }
+
+          #packageAttach .dropdown-menu li a.dropdown-item:hover {
+            background-color: unset;
+          }
+        </style>
+        <select data-style="btn-dark" class="form-control selectpicker border  bg-dark text-white rounded-0" name="packages" searchable="Search here.." data-live-search="true" multiple>
+          <option data-tokens="price" value="price">Price</option>
+          <option data-tokens="translator" value="translator">Translator</option>
+          <option data-tokens="datePicker" value="datePicker">Date picker</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group p-3 cool-shadow bg-dark">
+      <label>Hash Token</label>
+      <div class="option">
+        <div class="row" style="align-items: center;">
+          <div class="col">
+            <input type="text" class="form-control  bg-dark text-white rounded-0" name="hashToken" placeholder="Enter a task HASH TOKEN" required>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-light cool-shadow p-2-3">DO</button>
+  </form>
 </div>
