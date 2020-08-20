@@ -119,17 +119,38 @@
 // require('./worker/sayHello')
     // productRename($, nameReplacements);
 // }
-const path = require('path');
-const fs = require('fs');
-const {_autoprefixer} = require('./src/functions/img/index.js')
 
-const websitePath = path.resolve('./uploads/projects/test-delete-aaaa-1597684539796/website');
-
-console.log('websitePath = ', websitePath);
+// const path = require('path');
+// const fs = require('fs');
+// const {_autoprefixer} = require('./src/functions/img/index.js')
+//
+// const websitePath = path.resolve('./uploads/projects/test-delete-aaaa-1597684539796/website');
+//
+// console.log('websitePath = ', websitePath);
+//
+// const x = async () => {
+//     console.log('Started _autoprefixer')
+//     console.log(path.resolve( `${websitePath}/css`));
+//     console.log('_autoprefixer done = ' , await _autoprefixer(path.resolve(`${websitePath}/css`), path.resolve(`${websitePath}/css`)))
+// }
+// x();
+const redis = require('./src/functions/redis')
+console.log(redis);
 
 const x = async () => {
-    console.log('Started _autoprefixer')
-    console.log(path.resolve( `${websitePath}/css`));
-    console.log('_autoprefixer done = ' , await _autoprefixer(path.resolve(`${websitePath}/css`), path.resolve(`${websitePath}/css`)))
+    await redis.connect();
+
+    const {client} = redis;
+
+    client.hmset("users", {
+        user_id_1: JSON.stringify({
+            name : 'Gago'
+        })
+    });
+
+    client.hgetall("users", function (err, object) {
+        console.log(object);
+    });
 }
+
 x();
