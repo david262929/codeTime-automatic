@@ -330,20 +330,6 @@ const doTask = async (options = {}) => new Promise(async resolve => {
             console.log('Have not any img file')
         }
 
-        // const imgDistPath = `${websitePath}/img_dist`
-        // const distPathImgs = await getPathAllFiles(imgDistPath)
-        // distPathImgs.map(async compressedImgName => {
-        //     const realImgName = compressedImgName.replace('prefix_', '');
-        //     const realOldImgPath = path.resolve(`${websitePath}/img/${realImgName}`);
-        //
-        //     console.log('delete realOldImgPath = ', realOldImgPath, await deleteFile(realOldImgPath));
-        //
-        //     await moveFile(`${imgDistPath}/${compressedImgName}`, realOldImgPath);
-        // })
-        // console.log('delete zipFilePath = ', zipFilePath, await deleteFile(zipFilePath))
-
-
-
         const isHtmlWroten = await writeFile(htmlPath, $.html());
         console.log('wroten a HTML = ', isHtmlWroten);
 

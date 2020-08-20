@@ -20,8 +20,8 @@ const generateNavbarData = (active = '/') => {
                 href : '/',
             },
             {
-                text : 'Automatic',
-                href : '/automatic',
+                text : 'Documentation',
+                href : '/automatic/documentation',
             },
             // {
             //     text : 'Settings',
@@ -55,8 +55,8 @@ router.get('/',  async (req, res) => {
                 data : generateNavbarData(req._parsedUrl.pathname)
             },
             {
-                viewPathName : 'pages/home',
-                data : generateMarkdownHTML()
+                viewPathName : 'pages/automatic',
+                data : 'davo_ davo _davo'
             }
         ]
     });
@@ -64,7 +64,7 @@ router.get('/',  async (req, res) => {
 
 
 
-router.get("/automatic", async (req, res) => {
+router.get("/automatic/documentation", async (req, res) => {
     res.render("main",  {
         components : [
             {
@@ -72,8 +72,8 @@ router.get("/automatic", async (req, res) => {
                 data : generateNavbarData(req._parsedUrl.pathname)
             },
             {
-                viewPathName : 'pages/automatic',
-                data : 'davo_ davo _davo'
+                viewPathName : 'pages/automaticDocumentation',
+                data : generateMarkdownHTML()
             }
         ]
     });
