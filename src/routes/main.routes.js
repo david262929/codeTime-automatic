@@ -11,31 +11,34 @@ const router = Router();
 
 const auth = require('../middleware/auth.middleware')
 
-const generateNavbarData = (active = '/') => ({
-    active,
-    buttons : [
-        {
-            text : 'Home',
-            href : '/',
-        },
-        {
-            text : 'Automatic',
-            href : '/automatic',
-        },
-        {
-            text : 'Settings',
-            href : '/settings',
-        },
-        {
-            text : 'Login',
-            href : '/login',
-        },
-        {
-            text : 'Register',
-            href : '/register',
-        }
-    ]
-})
+const generateNavbarData = (active = '/') => {
+    const data = {
+        active,
+        buttons : [
+            {
+                text : 'Home',
+                href : '/',
+            },
+            {
+                text : 'Automatic',
+                href : '/automatic',
+            },
+            {
+                text : 'Settings',
+                href : '/settings',
+            },
+            {
+                text : 'Login',
+                href : '/login',
+            },
+            {
+                text : 'Register',
+                href : '/register',
+            }
+        ]
+    }
+    return data;
+}
 
 const generateMarkdownHTML = () => {
     const md = require('markdown-it')();
