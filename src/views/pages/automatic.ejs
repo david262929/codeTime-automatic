@@ -1,18 +1,6 @@
-<div class="container bg-secondary p-3">
+<div class="container">
 
   <style>
-    * {
-      transition: .5s ease;
-    }
-
-    .hide {
-      display: none;
-    }
-
-    .show {
-      display: block;
-    }
-
     .flex {
       display: flex;
       flex-wrap: wrap;
@@ -20,36 +8,20 @@
     }
   </style>
 
-  <script>
-    const hide = el => {
-      el.classList.add('hide');
-      el.classList.remove('show');
-    }
-    const show = el => {
-      el.classList.remove('hide');
-      el.classList.add('show');
-    }
-  </script>
-
-
   <form method="post" action="/options" enctype="multipart/form-data">
     <div class="card-panel">
       <div class="row flex">
-        <div class="col s6">
-          <div class="input-field">
-            <input id="telegramID" type="number" class="validate" name="telegramID" required>
-            <label for="telegramID">Your Telegram ID</label>
-            <span class="helper-text" data-error="wrong" data-success="right">
-              Paste Your <a href="https://t.me/codeTimeAutomaticNotifier_Bot" target="_blank">Telegram ID</a>
-            </span>
-          </div>
+        <div class="input-field col s6">
+          <input id="telegramID" type="number" class="validate" name="telegramID" tabindex="1" required>
+          <label for="telegramID">Your Telegram ID</label>
+          <span class="helper-text" data-error="wrong" data-success="right">
+            Paste Your <a href="https://t.me/codeTimeAutomaticNotifier_Bot" target="_blank">Telegram ID</a>
+          </span>
         </div>
-        <div class="col s6">
-          <div class="input-field">
-            <input id="taskName" type="text" class="validate" name="taskName" required>
-            <label for="taskName">Project name</label>
-            <span class="helper-text" data-error="wrong" data-success="right">Write your project name</span>
-          </div>
+        <div class="input-field col s6">
+          <input id="taskName" type="text" class="validate" name="taskName" tabindex="2" required>
+          <label for="taskName">Project name</label>
+          <span class="helper-text" data-error="wrong" data-success="right">Write your project name</span>
         </div>
         <div class="col s3">
           <div class="input-field">
@@ -65,7 +37,7 @@
         </div>
         <div class="col s9">
           <div class="input-field " id="checkout-url">
-            <input id="toScrappUrl" type="text" class="validate" name="toScrappUrl" required>
+            <input id="toScrappUrl" type="text" class="validate" name="toScrappUrl" tabindex="3" required>
             <label for="toScrappUrl">URL web site</label>
           </div>
           <div class="file-field input-field hide" id="checkout-upload">
@@ -78,75 +50,41 @@
             </div>
           </div>
         </div>
-        <div class="col s12">
-          <div class="input-field">
-            <select name="department">
-              <option value="" disabled selected>Choose your Department</option>
-              <option value="vitrina">Vitrina</option>
-              <option value="lpl">LPL</option>
-              <option value="msk">MSK</option>
-            </select>
-            <label>Department</label>
-          </div>
+        <div class="input-field col s6">
+          <input name="productOldName" placeholder="Old offer" id="productOldName" tabindex="4" type="text">
+          <label for="productOldName">Product Old Name</label>
+        </div>
+        <div class="input-field col s6">
+          <input name="productNewName" placeholder="New offer" id="productNewName" tabindex="5" type="text">
+          <label for="productNewName">Product New Name</label>
+        </div>
+        <div class="input-field col s12">
+          <select id="department" name="department">
+            <option value="" disabled selected>Choose your Department</option>
+            <option value="vitrina">Vitrina</option>
+            <option value="lpl">LPL</option>
+            <option value="msk">MSK</option>
+            <option value="rst">RST</option>
+            <option value="st">ST</option>
+            <option value="ukraina">Ukraina</option>
+            <option value="spb">SPB</option>
+          </select>
+          <label>Department</label>
         </div>
       </div>
     </div>
-
-    <div class="form-group p-3 cool-shadow bg-dark">
-      <label>Product Name for replacement</label>
-      <div class="option" id="productNameReplacement">
-        <div class="row" style="align-items: center;">
-          <div class="col">
-            <input type="text" class="form-control  bg-dark text-white rounded-0" name="productOldName" placeholder="Enter an old product name">
-          </div>
-          ->
-          <div class="col">
-            <input type="text" class="form-control bg-dark text-white rounded-0" name="productNewName" placeholder="Enter an new product name">
-          </div>
+    <div class="card-panel">
+      <div class="row">
+        <div class="input-field col s6">
+          <input name="productHash" placeholder="Hash" id="productHash" type="text">
+          <label for="productHash">Product Hash</label>
         </div>
-      </div>
-      <script>
-        (() => {
-          const oldNameInput = document.querySelector(`#productNameReplacement input[name='productOldName']`)
-          const newNameInput = document.querySelector(`#productNameReplacement input[name='productNewName']`)
-          oldNameInput.addEventListener('input', () => oldNameInput.value === '' ? newNameInput.removeAttribute('required') : newNameInput.setAttribute('required', 'required'))
-        })()
-      </script>
-    </div>
-    <div class="form-group p-3 cool-shadow bg-dark">
-      <label>Package(s) attach</label>
-      <div class="option" id="packageAttach">
-        <style>
-          #packageAttach .dropdown-menu li.selected {
-            background-color: #007bff;
-          }
-
-          #packageAttach .dropdown-menu li:hover a.dropdown-item {
-            transform: scale(.95);
-          }
-
-          #packageAttach .dropdown-menu li a.dropdown-item:hover {
-            background-color: unset;
-          }
-        </style>
-        <select data-style="btn-dark" class="form-control selectpicker border  bg-dark text-white rounded-0" name="packages" searchable="Search here.." data-live-search="true" multiple>
-          <option data-tokens="price" value="price">Price</option>
-          <option data-tokens="translator" value="translator">Translator</option>
-          <option data-tokens="datePicker" value="datePicker">Date picker</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group p-3 cool-shadow bg-dark">
-      <label>Hash Token</label>
-      <div class="option">
-        <div class="row" style="align-items: center;">
-          <div class="col">
-            <input type="text" class="form-control  bg-dark text-white rounded-0" name="hashToken" placeholder="Enter a task HASH TOKEN" required>
-          </div>
+        <div class="input-field col s6">
+          <input name="productToken" placeholder="Token" id="productToken" type="text">
+          <label for="productToken">Product Token</label>
         </div>
       </div>
     </div>
-
-    <button type="submit" class="btn btn-light cool-shadow p-2-3">DO</button>
+    <button type="submit" class="waves-effect waves-light btn-large">Let's go</button>
   </form>
 </div>
