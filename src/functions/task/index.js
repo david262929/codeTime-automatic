@@ -305,17 +305,30 @@ const doTask = async (options = {}) => new Promise(async resolve => {
 
         addCountryCode($)
 
-        console.log('Started _autoprefixer')
-        console.log(path.resolve( `${websitePath}/css`));
-        console.log('_autoprefixer done = ' , await _autoprefixer(path.resolve(`${websitePath}/css`), path.resolve(`${websitePath}/css`)))
+        const cssDir = path.resolve( `${websitePath}/css`)
+        console.log( cssDir );
+        if(dirExists(cssDir)){
+            console.log('Started _autoprefixer')
+            console.log('_autoprefixer done = ' , await _autoprefixer( cssDir , cssDir))
+        }else{
+            console.log('Have not any css file')
+        }
 
-        console.log('Started imgOPtimizer')
-        console.log(path.resolve( `${websitePath}/img`));
-        console.log('imgOptimizer done = ' , await _compressImages(
-            path.resolve(`${websitePath}/img`),
-            ['jpg', 'jpeg', 'JPG', 'JPEG', 'PNG'],
-            path.resolve(`${websitePath}/img`))
-        )
+
+        const imgDir = path.resolve( `${websitePath}/img`)
+        if(dirExists(imgDir)){
+            console.log('Started imgOPtimizer')
+            console.log( imgDir );
+            console.log('imgOptimizer done = ' , await _compressImages(
+                imgDir,
+                ['jpg', 'jpeg', 'JPG', 'JPEG', 'PNG'],
+                imgDir
+                )
+            )
+
+        }else{
+            console.log('Have not any img file')
+        }
 
         // const imgDistPath = `${websitePath}/img_dist`
         // const distPathImgs = await getPathAllFiles(imgDistPath)
