@@ -22,7 +22,7 @@ app.use(express.static('./dist'))
 
 app.use('/uploads', express.static(path.join(__dirname + '/uploads')))
 app.use(express.static('./logs'))
-const notify = require('./src/functions/telegram.notify.js');
+// const notify = require('./src/functions/telegram.notify.js');
 
 app.use('/', require('./src/routes/auth.routes'));
 app.use('/', require('./src/routes/main.routes'));
@@ -41,11 +41,9 @@ app.post('/options', checkOptions, async (req, res) => {// .check,
         if (!isAddedTask) {
             throw('Something wen wrong with task adding into QUEUE');
         }
-        isAddedTask = isAddedTask.replace( path.resolve(), config.get('baseRealUrl') )
 
-        // await notify(589781832, isAddedTask);
-
-        res.end(isAddedTask)
+        // await notify(589781832, 'isAddedTask = ' + (isAddedTask ? 'true' : 'false') );
+        res.end('isAddedTask = ' + (isAddedTask ? 'true' : 'false' ))
     } catch (e) {
         log(e, null, 'endpoint_options', 'error')
         res.status(500).end(`500 Server error.`)

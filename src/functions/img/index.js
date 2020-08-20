@@ -41,11 +41,14 @@ const _webp = async (imagesPattern = './img/*.{png,jpg,jpeg,JPG,JPEG}', exportDi
 const _compressImages = async (
     imagesPath = './img',
     extentions = ['png', 'jpg', 'jpeg', 'JPG', 'JPEG'],
-    exportDir = './img'
+    exportPath = './img/prefix_'
 ) => new Promise(async resolve => {
+
+    const tempExportPath = exportPath + '/img_dist';
+
     const result = await compress({
         source: `${imagesPath}/*.{${extentions.join(',')}}`,
-        destination: exportDir,
+        destination: `${tempExportPath}/prefix_`,
         enginesSetup: {
             jpg: {engine: "mozjpeg", command: ["-quality", "60"]},
             png: {engine: "pngquant", command: ["--quality=20-50"]},
@@ -60,7 +63,15 @@ const _compressImages = async (
 
     if (errors.length) {
         log(errors);
+        resolve(false);
+        return;
     }
+
+    console.log( '_autoprefixer started moving files', ' \n  - from = ', tempExportPath, ' \n  - to = ', imagesPath )
+    console.log( '_autoprefixer result status ', await moveFilesFromDirOnReplaceMode( tempExportPath, imagesPath,  fileName => fileName.replace('prefix_', '')) )
+    console.log( '_autoprefixer ended moving files' )
+    resolve(true)
+
 
     resolve(!!errors.length)
 })
@@ -298,7 +309,7 @@ const _resize = async (
     });
 })
 
-const moveFilesFromDirOnReplaceMode = (fromDir, toDir) => new Promise(async resolve => {
+const moveFilesFromDirOnReplaceMode = (fromDir, toDir, fileNameCallback = fileName => fileName ) => new Promise(async resolve => {
     const distPathFiles = await getPathAllFiles(fromDir);
 
     if (!distPathFiles.length) {
@@ -306,13 +317,14 @@ const moveFilesFromDirOnReplaceMode = (fromDir, toDir) => new Promise(async reso
     }
 
     distPathFiles.map(async (compressedFileName, index) => {
-        const realOldFilePath = path.resolve(`${toDir}/${compressedFileName}`);
+        const realImgName = fileNameCallback(compressedFileName);
+        const realOldFilePath = path.resolve(`${toDir}/${realImgName}`);
 
         console.log('delete realOldFIlePath = ', realOldFilePath, await deleteFile(realOldFilePath));
 
         console.log('new File Moves realOldFIlePath = ', await moveFile(`${fromDir}/${compressedFileName}`, realOldFilePath));
 
-        if (index === distPathFiles.length) {
+        if (index === distPathFiles.length - 1) {
             resolve(true);
         }
     })
@@ -327,7 +339,10 @@ const _autoprefixer = async (cssPath = './css', exportPath = './css') => new Pro
         .pipe(gulp.dest(tempExportPath))
 
     stream.on('end', async () => {
+        console.log('_autoprefixer started moving files', ' \n  - from = ', tempExportPath, ' \n  - to = ', cssPath )
         await moveFilesFromDirOnReplaceMode( tempExportPath, cssPath )
+        console.log('_autoprefixer ended moving files')
+        resolve(true)
     });
     stream.on('error', (err) => {
         if (err) {

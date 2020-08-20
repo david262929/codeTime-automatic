@@ -1,6 +1,8 @@
 const gulp = require('gulp');
 const path = require('path');
 const fs = require('fs');
+const config = require('config');
+// const notify = require('../telegram.notify');
 const {
     _webp,
     _resizeWIthWidth,
@@ -312,19 +314,19 @@ const doTask = async (options = {}) => new Promise(async resolve => {
         console.log('imgOptimizer done = ' , await _compressImages(
             path.resolve(`${websitePath}/img`),
             ['jpg', 'jpeg', 'JPG', 'JPEG', 'PNG'],
-            path.resolve(`${websitePath}/img_dist/prefix_`))
+            path.resolve(`${websitePath}/img`))
         )
 
-        const imgDistPath = `${websitePath}/img_dist`
-        const distPathImgs = await getPathAllFiles(imgDistPath)
-        distPathImgs.map(async compressedImgName => {
-            const realImgName = compressedImgName.replace('prefix_', '');
-            const realOldImgPath = path.resolve(`${websitePath}/img/${realImgName}`);
-
-            console.log('delete realOldImgPath = ', realOldImgPath, await deleteFile(realOldImgPath));
-
-            await moveFile(`${imgDistPath}/${compressedImgName}`, realOldImgPath);
-        })
+        // const imgDistPath = `${websitePath}/img_dist`
+        // const distPathImgs = await getPathAllFiles(imgDistPath)
+        // distPathImgs.map(async compressedImgName => {
+        //     const realImgName = compressedImgName.replace('prefix_', '');
+        //     const realOldImgPath = path.resolve(`${websitePath}/img/${realImgName}`);
+        //
+        //     console.log('delete realOldImgPath = ', realOldImgPath, await deleteFile(realOldImgPath));
+        //
+        //     await moveFile(`${imgDistPath}/${compressedImgName}`, realOldImgPath);
+        // })
         // console.log('delete zipFilePath = ', zipFilePath, await deleteFile(zipFilePath))
 
 
@@ -332,11 +334,17 @@ const doTask = async (options = {}) => new Promise(async resolve => {
         const isHtmlWroten = await writeFile(htmlPath, $.html());
         console.log('wroten a HTML = ', isHtmlWroten);
 
-        const newZipDir = await zipDir(path.resolve(`${websitePath}/../website/`), path.resolve(`${websitePath}/../archive/exported.zip`) )
+        let newZipDir = await zipDir(path.resolve(`${websitePath}/../website/`), path.resolve(`${websitePath}/../archive/exported.zip`) )
         console.log("zipDir = ", newZipDir);
 
         console.log('All was done');
 
+
+        newZipDir = newZipDir.replace( path.resolve(), config.get('baseRealUrl') )
+
+        // await notify(589781832, 'newZipDir = ', newZipDir );
+
+        console.log('newZipDir = ', newZipDir)
         return resolve(newZipDir)
     }catch (e) {
         log(e);
@@ -346,7 +354,8 @@ const doTask = async (options = {}) => new Promise(async resolve => {
 
 
 module.exports = {
-    addTask
+    addTask,
+    doTask
 };
 // console.log(gulp.start(
 //     'resize'
