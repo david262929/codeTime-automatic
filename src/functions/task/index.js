@@ -209,18 +209,22 @@ const doTask = async (options = {}) => new Promise(async resolve => {
     try {
         const {department} = options;
 
-        const {files: {type, data}} = options;
+        const {files: {type, data}, name} = options;
 
         if (!type || !data) {
             throw('Url/Zip have incorrect DATA');
             return resolve(false)
         }
 
+        if(!name){
+            throw('Have not passed a name');
+            return resolve(false)
+        }
+
         let websitePath = '';
-        const projectDir = data;
         switch (type) {
             case 'url':
-                const projectTemp = await scrapper({url: data})
+                const projectTemp = await scrapper({url: data}, name)
                 websitePath = `${projectTemp}/website`;
                 _makeDir(path.resolve(`${websitePath}/../archive`))
                 break;
