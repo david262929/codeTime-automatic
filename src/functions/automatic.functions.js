@@ -239,7 +239,7 @@ const createUploadsTempDir = async (websitePrefix = '', path = 'uploads/projects
     }
 })
 
-const isUrlWorking = async (url, method = 'OPTIONS') => new Promise(resolve => request( {url, method}, (err, res) => {
+const isUrlWorking = async (url, method = 'GET') => new Promise(resolve => request( {url, method}, (err, res) => {
     const haveError = !!err;
 
     if (haveError) {
@@ -285,9 +285,9 @@ const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}) => new Prom
             urls: [ url ],
             directory: websiteDir,
             subdirectories: [
-                {directory: 'img', extensions: [ '.jpg', '.png' ]},
+                {directory: 'img', extensions: [ '.jpg', '.png' , '.svg']},
                 {directory: 'js', extensions: [ '.js' ]},
-                {directory: 'css', extensions: [ '.css', '.svg' ]}
+                {directory: 'css', extensions: [ '.css', ]}
             ],
             sources: [
                 {selector: 'img', attr: 'src'},
