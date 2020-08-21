@@ -210,7 +210,7 @@ const doTask = async (options = {}) => new Promise(async resolve => {
         const {department} = options;
 
         const {files: {type, data}, name} = options;
-
+        console.log({type, data})
         if (!type || !data) {
             throw('Url/Zip have incorrect DATA');
             return resolve(false)
