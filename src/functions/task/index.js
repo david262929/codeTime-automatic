@@ -19,7 +19,7 @@ const concat = require('gulp-concat');
 const minify = require('gulp-minify');
 const cleanCSS = require('gulp-clean-css');
 const gulpuncss = require('gulp-uncss');
-const {log, deleteFile, scrapper, dirExists, writeFile, getPathAllFiles, fileExists, _makeDir} = require('../automatic.functions');
+const {log, deleteFile, scrapper, dirExists, writeFile, getPathAllFiles, fileExists, _makeDir, getDirName} = require('../automatic.functions');
 const {unZip, zipDir} = require('../zip');
 const cheerio = require('cheerio')
 const redisQueue = require("../queue/redis");
@@ -79,8 +79,8 @@ const addTask = async (task) => new Promise(async resolve => {
         return resolve(false)
     }
     try {
-        const _addedTask = await doTask(task)
-        // const _addedTask = await redisQueue.enqueue(task)
+        // const _addedTask = await doTask(task)
+        const _addedTask = await redisQueue.enqueue(task)
         console.log('_addedTask = ', _addedTask);
         return resolve(_addedTask)
     } catch (e) {
@@ -209,18 +209,22 @@ const doTask = async (options = {}) => new Promise(async resolve => {
     try {
         const {department} = options;
 
-        const {files: {type, data}} = options;
+        const {files: {type, data}, name} = options;
 
         if (!type || !data) {
             throw('Url/Zip have incorrect DATA');
             return resolve(false)
         }
 
+        if(!name){
+            throw('Have not passed a name');
+            return resolve(false)
+        }
+
         let websitePath = '';
-        const projectDir = data;
         switch (type) {
             case 'url':
-                const projectTemp = await scrapper({url: data})
+                const projectTemp = await scrapper({url: data}, name)
                 websitePath = `${projectTemp}/website`;
                 _makeDir(path.resolve(`${websitePath}/../archive`))
                 break;
@@ -333,11 +337,12 @@ const doTask = async (options = {}) => new Promise(async resolve => {
         const isHtmlWroten = await writeFile(htmlPath, $.html());
         console.log('wroten a HTML = ', isHtmlWroten);
 
-        let newZipDir = await zipDir(path.resolve(`${websitePath}/../website/`), path.resolve(`${websitePath}/../archive/exported.zip`) )
+        const projectDirName = getDirName(path.resolve(`${websitePath}/../`));
+        let newZipDir = await zipDir(path.resolve(`${websitePath}/../website/`), path.resolve(`${websitePath}/../archive/${projectDirName}.zip`) )
+
         console.log("zipDir = ", newZipDir);
 
         console.log('All was done');
-
 
         newZipDir = newZipDir.replace( path.resolve(), config.get('baseRealUrl') )
 

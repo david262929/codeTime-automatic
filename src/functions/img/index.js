@@ -68,10 +68,10 @@ const _compressImages = async (
     }
 
     console.log( '_autoprefixer started moving files', ' \n  - from = ', tempExportPath, ' \n  - to = ', imagesPath )
-    console.log( '_autoprefixer result status ', await moveFilesFromDirOnReplaceMode( tempExportPath, imagesPath,  fileName => fileName.replace('prefix_', '')) )
+    const movingStatus = await moveFilesFromDirOnReplaceMode( tempExportPath, imagesPath,  fileName => fileName.replace('prefix_', ''))
+    console.log( '_autoprefixer result status ', movingStatus)
     console.log( '_autoprefixer ended moving files' )
     resolve(true)
-
 
     resolve(!!errors.length)
 })
@@ -320,9 +320,11 @@ const moveFilesFromDirOnReplaceMode = (fromDir, toDir, fileNameCallback = fileNa
         const realImgName = fileNameCallback(compressedFileName);
         const realOldFilePath = path.resolve(`${toDir}/${realImgName}`);
 
-        console.log('delete realOldFIlePath = ', realOldFilePath, await deleteFile(realOldFilePath));
+        const deletedFile =await deleteFile(realOldFilePath)
+        console.log('delete realOldFIlePath = ', realOldFilePath, deletedFile);
 
-        console.log('new File Moves realOldFIlePath = ', await moveFile(`${fromDir}/${compressedFileName}`, realOldFilePath));
+        const movedFile = await moveFile(`${fromDir}/${compressedFileName}`, realOldFilePath)
+        console.log('new File Moves realOldFIlePath = ', movedFile);
 
         if (index === distPathFiles.length - 1) {
             resolve(true);

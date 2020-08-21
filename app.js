@@ -42,9 +42,9 @@ app.post('/options', checkOptions, async (req, res) => {// .check,
             throw('Something wen wrong with task adding into QUEUE');
         }
 
-        const {telegramID} = req.task;
+        const {telegramID, name} = req.task;
 
-        await notify( telegramID, 'isAddedTask = ' + isAddedTask );
+        await notify( telegramID, `${name} -- Task -- added = ${isAddedTask}` );
         res.end('isAddedTask = ' + isAddedTask)
     } catch (e) {
         log(e, null, 'endpoint_options', 'error')

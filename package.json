@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "davo": "nodemon test.app.js",
-    "worker": "nodemon worker/redisQueue.js",
+    "worker": "node worker/redisQueue.js",
     "workerTest": "nodemon worker/push.data.js",
     "test": "node test.app.js",
     "server": "nodemon app.js"

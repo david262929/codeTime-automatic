@@ -22,7 +22,7 @@ module.exports = async (req, res, next) => new Promise( async resolve => {
             return res.end(`taskName not passed`);
         }
 
-        task.name = taskName;
+        task.name = taskName.split(' ').join('-');
 
         const {starterSelector} = req.body;
         const files = {
@@ -57,7 +57,7 @@ module.exports = async (req, res, next) => new Promise( async resolve => {
                 // console.log('req.files.zipFile=', req.files.zipFile)
 
                 const curDateWithMilliseconds = (new Date()).getTime()
-                let newProjectDir = await createUploadsTempDir(null, `uploads/projects/${taskName}-${curDateWithMilliseconds}`) // (Folder || Project) name + HASHs
+                let newProjectDir = await createUploadsTempDir(null, `uploads/projects/${name}-${taskName}-${curDateWithMilliseconds}`) // (Folder || Project) name + HASHs
                 let newZipFileDirName = await createUploadsTempDir(null, `${newProjectDir}/archive`)
 
                 console.log(newZipFileDirName);

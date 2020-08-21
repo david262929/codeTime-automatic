@@ -239,7 +239,7 @@ const createUploadsTempDir = async (websitePrefix = '', path = 'uploads/projects
     }
 })
 
-const isUrlWorking = async (url, method = 'OPTIONS') => new Promise(resolve => request( {url, method}, (err, res) => {
+const isUrlWorking = async (url, method = 'GET') => new Promise(resolve => request( {url, method}, (err, res) => {
     const haveError = !!err;
 
     if (haveError) {
@@ -258,7 +258,7 @@ const removeLastSlash = async (pathname = '') => new Promise( resolve => {
     resolve(pathname);
 })
 
-const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}) => new Promise(async (resolve, reject) => {
+const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}, projectNamePrefix = '') => new Promise(async (resolve, reject) => {
     try {
         const _isUrlWorking = await isUrlWorking(url);
         if(!_isUrlWorking){
@@ -271,7 +271,7 @@ const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}) => new Prom
         let {hostname, pathname} = parseUrl(url, true)
 
         pathname = await removeLastSlash(pathname);
-        const prefix = (hostname + pathname).replace(/\//gm, '-')
+        const prefix = `${projectNamePrefix}-${hostname}${pathname}`.replace(/\//gm, '-')
 
         let projectDir = await createUploadsTempDir(null,`uploads/projects/${prefix}-${curDateWithMilliseconds}`) // (Folder || Project) name + HASH
 
@@ -285,9 +285,9 @@ const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}) => new Prom
             urls: [ url ],
             directory: websiteDir,
             subdirectories: [
-                {directory: 'img', extensions: [ '.jpg', '.png' ]},
+                {directory: 'img', extensions: [ '.jpg', '.jpeg', '.gif', '.png' , '.svg']},
                 {directory: 'js', extensions: [ '.js' ]},
-                {directory: 'css', extensions: [ '.css', '.svg' ]}
+                {directory: 'css', extensions: [ '.css', ]}
             ],
             sources: [
                 {selector: 'img', attr: 'src'},
@@ -308,6 +308,14 @@ const scrapper = ({url = 'http://codetime.am/', countryCode = 'AM'}) => new Prom
     }
 })
 
+
+
+const getDirName = (fullPath) => {
+    const splitedPath = fullPath.split('/');
+    const lastElement = splitedPath.pop();
+    return lastElement === '' ? splitedPath.pop() : lastElement;
+}
+
 module.exports = {
     _makeDir,
     fileExists,
@@ -324,4 +332,5 @@ module.exports = {
     writeFile,
     getPathAllFiles,
     copyFile,
+    getDirName,
 }
