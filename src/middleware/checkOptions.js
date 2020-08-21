@@ -22,7 +22,7 @@ module.exports = async (req, res, next) => new Promise( async resolve => {
             return res.end(`taskName not passed`);
         }
 
-        task.name = taskName;
+        task.name = taskName.split(' ').join('-');
 
         const {starterSelector} = req.body;
         const files = {

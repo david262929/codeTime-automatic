@@ -1,3 +1,4 @@
+const {log} = require('./automatic.functions')
 const TelegramBot = require('node-telegram-bot-api');
 
 // replace the value below with the Telegram token you receive from @BotFather
@@ -14,7 +15,8 @@ bot.onText(/\/getmyid/, (msg, match) => {
 
 // Listen for any kind of message. There are different kinds of
 // messages.
-bot.on("polling_error", (err) => console.log(err));
+bot.on("polling_error", err => log( err, null, 'telegram_bot', 'error', false ) );
+
 
 module.exports = async ( chatId = 589781832, message = '') => new Promise( async resolve => {
     if(!chatId || chatId === '' || !Number.isInteger( +chatId )){
@@ -28,5 +30,5 @@ module.exports = async ( chatId = 589781832, message = '') => new Promise( async
         return;
     }
 
-    bot.sendMessage(chatId, `Privet: ${message}`);
+    bot.sendMessage(chatId, `${message}`);
 })
