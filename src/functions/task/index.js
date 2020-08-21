@@ -79,8 +79,8 @@ const addTask = async (task) => new Promise(async resolve => {
         return resolve(false)
     }
     try {
-        // const _addedTask = await doTask(task)
-        const _addedTask = await redisQueue.enqueue(task)
+        const _addedTask = await doTask(task)
+        // const _addedTask = await redisQueue.enqueue(task)
         console.log('_addedTask = ', _addedTask);
         return resolve(_addedTask)
     } catch (e) {
