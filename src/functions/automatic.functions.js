@@ -126,7 +126,7 @@ const log = async (data, prefix = null, mode = 'endpoint_main', type = 'error') 
 
     const allowed = {
         types: ['error', 'message'],
-        modes: ['endpoint_main', 'endpoint_compress', 'endpoint_options', 'worker_tasks', 'system_error']
+        modes: ['endpoint_main', 'endpoint_compress', 'endpoint_options', 'worker_tasks', 'system_error', 'telegram_bot']
     }
     try {
         if (!data) {
