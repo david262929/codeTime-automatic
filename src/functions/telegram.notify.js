@@ -9,7 +9,6 @@ const bot = new TelegramBot(token, {polling: true});
 
 bot.onText(/\/getmyid/, (msg, match) => {
     const chatId = msg.chat.id;
-    console.log(chatId)
     bot.sendMessage(chatId, `Your ID:  ${chatId} `);//
 });
 
@@ -19,16 +18,22 @@ bot.on("polling_error", err => log( err, null, 'telegram_bot', 'error', false ) 
 
 
 module.exports = async ( chatId = 589781832, message = '') => new Promise( async resolve => {
-    if(!chatId || chatId === '' || !Number.isInteger( +chatId )){
-        throw "Please pass a real chatId.";
-        resolve();
-        return;
-    }
-    if( !message || message === '' || typeof message !== 'string'){
-        throw "Please pass a normal message.";
-        resolve();
-        return;
-    }
+    try {
+        if(!chatId || chatId === '' || !Number.isInteger( +chatId )){
+            throw "Please pass a real chatId.";
+            resolve(false);
+            return;
+        }
+        if( !message || message === '' || typeof message !== 'string'){
+            throw "Please pass a normal message.";
+            resolve(false);
+            return;
+        }
 
-    bot.sendMessage(chatId, `${message}`);
+        bot.sendMessage(chatId, `${message}`);
+        resolve(true);
+    }catch(err){
+        log( err, null, 'telegram_bot', 'error', false );
+        resolve(false)
+    }
 })

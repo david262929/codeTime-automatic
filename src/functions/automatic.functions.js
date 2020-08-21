@@ -120,13 +120,13 @@ const appendIntoLogFile = async (data, logFileName, type) => new Promise(async r
     fs.appendFile(LOGFILE_PATH, `${type} : ${JSON.stringify(data)}\n Date : ${new Date()}\n------------------\n`, resolve);
 })
 
-const log = async (data, prefix = null, mode = 'endpoint_main', type = 'error') => {
-    console.log({data, prefix, mode, type});
+const log = async (data, prefix = null, mode = 'endpoint_main', type = 'error', toConsoleLog = true) => {
+    if(toConsoleLog) console.log({data, prefix, mode, type});
 
 
     const allowed = {
         types: ['error', 'message'],
-        modes: ['endpoint_main', 'endpoint_compress', 'endpoint_options', 'worker_tasks', 'system_error', 'telegram_bot']
+        modes: ['endpoint_main', 'endpoint_compress', 'endpoint_options', 'worker_tasks', 'system_error', 'telegram_bot', 'telegram_bot_notify']
     }
     try {
         if (!data) {

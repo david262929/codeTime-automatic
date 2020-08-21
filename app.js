@@ -34,7 +34,6 @@ app.use('/', require('./src/routes/main.routes'));
 
 app.post('/options', checkOptions, async (req, res) => {// .check,
     try {
-        // res.end(`aaa500 Server error1.`)
         console.log(req.task)
         let isAddedTask = await addTask(req.task);
         console.log('isAddedTask1111 = ', isAddedTask)
@@ -45,10 +44,10 @@ app.post('/options', checkOptions, async (req, res) => {// .check,
         const {telegramID, name} = req.task;
 
         await notify( telegramID, `${name} -- Task -- added = ${isAddedTask}` );
-        res.end('isAddedTask = ' + isAddedTask)
+        return res.end('isAddedTask = ' + isAddedTask.toString())
     } catch (e) {
         log(e, null, 'endpoint_options', 'error')
-        res.status(500).end(`500 Server error.`)
+        res.status(500).end(`500 Server error. Check endpoint_options log.`)
     }
 })
 

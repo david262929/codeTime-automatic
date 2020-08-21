@@ -79,9 +79,10 @@ const addTask = async (task) => new Promise(async resolve => {
         return resolve(false)
     }
     try {
-        const _addedTask = await doTask(task)
+        const _addedTask = await doTask(task, );
+        console.log('___doneTask___ = ', _addedTask);
         // const _addedTask = await redisQueue.enqueue(task)
-        console.log('_addedTask = ', _addedTask);
+        console.log('_addedTask = ', _addedTask.toString());
         return resolve(_addedTask)
     } catch (e) {
         log(e);
@@ -325,7 +326,7 @@ const doTask = async (options = {}) => new Promise(async resolve => {
             console.log( imgDir );
             console.log('imgOptimizer done = ' , await _compressImages(
                 imgDir,
-                ['jpg', 'jpeg', 'JPG', 'JPEG', 'PNG'],
+                ['png', 'jpg', 'jpeg', 'JPG', 'JPEG', 'PNG'],
                 imgDir
                 )
             )
@@ -345,11 +346,11 @@ const doTask = async (options = {}) => new Promise(async resolve => {
         console.log('All was done');
 
         newZipDir = newZipDir.replace( path.resolve(), config.get('baseRealUrl') )
+        console.log('___newZipDir___ = ', newZipDir);
 
         const {telegramID} = options;
         await notify(telegramID, `newZipDir = ${newZipDir}` );
 
-        console.log('newZipDir = ', newZipDir)
         return resolve(newZipDir)
     }catch (e) {
         log(e);

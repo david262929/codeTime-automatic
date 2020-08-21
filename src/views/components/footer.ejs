@@ -1,27 +1,35 @@
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() {
-    $('.sidenav').sidenav();
-    $('select').formSelect();
+    $(document).ready(function () {
+        $('.sidenav').sidenav();
+        $('select').formSelect();
 
-    $("#zipOrUrl").on('click', function() {
-      $("#checkout-upload, #checkout-url").removeClass("hide");
-      if ($(this).prop("checked") == true) {
-        $("#checkout-url").addClass("hide");
-      } else if ($(this).prop("checked") == false) {
-        $("#checkout-upload").addClass("hide");
-      }
-    })
-    $("select#department").change(function(){
-        let departmenValue = $(this).children(":selected").html();
-        if(departmenValue=="LPL") {
-            $("#productToken").parent().addClass("hide");
-            $("#productHash").parent().removeClass("s6").addClass("s12");
-        }
+        $("#zipOrUrl").on('click', function() {
+            $("#checkout-upload, #checkout-url").removeClass("hide");
+            $("#starterSelector").val("");
+            if ($(this).prop("checked") == true) {
+                $("#checkout-url").addClass("hide");
+                $("#starterSelector").val("upload");
+            } else if ($(this).prop("checked") == false) {
+                $("#checkout-upload").addClass("hide");
+                $("#starterSelector").val("url");
+            }
+        })
+
+        $("select#department").change(function(){
+            let departmenValue = $(this).children(":selected").html();
+            if(departmenValue=="LPL") {
+                $("#productToken").parent().addClass("hide");
+                $("#productHash").parent().removeClass("s6").addClass("s12");
+            }
+        });
+
     });
-  });
 </script>
 </body>
 

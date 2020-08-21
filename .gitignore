@@ -1,6 +1,7 @@
 # Project temp dirs
 uploads
 logs
+log
 
 # NPM files/dir
 package-lock.json
